@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    'mui_core',
+    'murpi_core',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,7 +51,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'MUI.urls'
+ROOT_URLCONF = 'MURPI.urls'
 
 TEMPLATES = [
     {
@@ -69,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'MUI.wsgi.application'
+WSGI_APPLICATION = 'MURPI.wsgi.application'
 
 
 # Database
@@ -82,7 +82,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': '',
         'HOST': '192.168.99.100',
-        'PORT': '32768'
+        'PORT': '32769'
     }
 }
 
