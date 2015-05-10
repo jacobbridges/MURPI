@@ -8,8 +8,8 @@ class Avatar(models.Model):
 
 
 class Player(models.Model):
-    name = models.CharField(max_length=60)
-    last_name = models.CharField(max_length=30)
+    name = models.CharField(max_length=100, blank=False)
+    password = models.CharField(max_length=40, blank=False)
     avatar = models.ForeignKey(Avatar)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
