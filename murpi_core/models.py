@@ -32,11 +32,11 @@ class PlayerEmail(models.Model):
 class Universe(models.Model):
     name = models.CharField(max_length=40, blank=False)
     short_description = models.CharField(max_length=500, null=True)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     owner = models.ForeignKey(Player, null=False)
     is_public = models.BooleanField(default=True, null=False)
-    thumbnail = models.ForeignKey(Photo)
-    background = models.ForeignKey(Photo, null=True)
+    thumbnail = models.ForeignKey(Photo, related_name='universe_thumbnail')
+    background = models.ForeignKey(Photo, related_name='universe_background', null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -45,11 +45,11 @@ class Universe(models.Model):
 class World(models.Model):
     name = models.CharField(max_length=40, blank=False)
     short_description = models.CharField(max_length=500, null=True)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     owner = models.ForeignKey(Player, null=False)
     universe = models.ForeignKey(Universe, null=False)
-    thumbnail = models.ForeignKey(Photo)
-    background = models.ForeignKey(Photo, null=True)
+    thumbnail = models.ForeignKey(Photo, related_name='world_thumbnail')
+    background = models.ForeignKey(Photo, related_name='world_background', null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -58,11 +58,11 @@ class World(models.Model):
 class Place(models.Model):
     name = models.CharField(max_length=40, blank=False)
     short_description = models.CharField(max_length=500, null=True)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     owner = models.ForeignKey(Player, null=False)
     world = models.ForeignKey(World, null=False)
-    thumbnail = models.ForeignKey(Photo)
-    background = models.ForeignKey(Photo, null=True)
+    thumbnail = models.ForeignKey(Photo, related_name='place_thumbnail')
+    background = models.ForeignKey(Photo, related_name='place_background', null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -86,9 +86,9 @@ class RoleplayStatus(models.Model):
 class Roleplay(models.Model):
     name = models.CharField(max_length=100, blank=False)
     short_description = models.CharField(max_length=500, null=True)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     owner = models.ForeignKey(Player, null=False)
-    plain_rules = models.CharField(null=True)
+    plain_rules = models.TextField(null=True)
     is_public = models.BooleanField(default=False, null=False)
     status = models.ForeignKey(RoleplayStatus, null=False)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -99,7 +99,7 @@ class Race(models.Model):
     name = models.CharField(max_length=50)
     universe = models.ForeignKey(Universe, null=False)
     short_description = models.CharField(max_length=500, null=True)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     owner = models.ForeignKey(Player, null=False)
     thumbnail = models.ForeignKey(Photo)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -109,7 +109,7 @@ class Race(models.Model):
 class Class(models.Model):
     name = models.CharField(max_length=50)
     race = models.ForeignKey(Race, null=True)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -117,28 +117,28 @@ class Class(models.Model):
 class Mastery(models.Model):
     name = models.name = models.CharField(max_length=50)
     race = models.ForeignKey(Race, null=True)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
 
 class Ability(models.Model):
     name = models.name = models.CharField(max_length=50)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
 
 class Skill(models.Model):
     name = models.name = models.CharField(max_length=50)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
 
 class Trait(models.Model):
     name = models.name = models.CharField(max_length=50)
-    description = models.CharField(blank=False)
+    description = models.TextField(blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -153,8 +153,8 @@ class Character(models.Model):
     name = models.CharField(max_length=100, blank=False)
     nick = models.CharField(max_length=100, null=True)
     race = models.ForeignKey(Race, blank=False)
-    primary_class = models.ForeignKey(Class, blank=False)
-    secondary_class = models.ForeignKey(Class)
+    primary_class = models.ForeignKey(Class, related_name='primary_class',  blank=False)
+    secondary_class = models.ForeignKey(Class, related_name='secondary_class')
     status = models.ForeignKey(CharacterStatus)
     avatar = models.ForeignKey(Photo)
     home_world = models.ForeignKey(World, blank=False)
@@ -186,7 +186,7 @@ class CharacterAbilities(models.Model):
 
 
 class Post(models.Model):
-    text = models.CharField(blank=False)
+    text = models.TextField(blank=False)
     author = models.ForeignKey(Player, null=False)
     character = models.ForeignKey(Character, null=False)
     scene = models.ForeignKey(Scene, null=False)
