@@ -1,7 +1,9 @@
 from django.db import models
 from jsonfield import JSONField
 
-# === Models for MUI_core ===
+# === Models for MURPI_core ===
+
+# Not adding the verbose documentation to each model until there is a working core.
 
 
 class Photo(models.Model):
@@ -100,9 +102,6 @@ class Race(models.Model):
     description = models.CharField(blank=False)
     owner = models.ForeignKey(Player, null=False)
     thumbnail = models.ForeignKey(Photo)
-    base_health = models.IntegerField(default=1, blank=False)
-    base_mana = models.IntegerField(default=0, blank=False)
-    base_rage = models.IntegerField(default=0, blank=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -110,9 +109,38 @@ class Race(models.Model):
 class Class(models.Model):
     name = models.CharField(max_length=50)
     race = models.ForeignKey(Race, null=True)
-    health_modifier = models.IntegerField(default=0, null=False)
-    mana_modifier = models.IntegerField
+    description = models.CharField(blank=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
+
+class Mastery(models.Model):
+    name = models.name = models.CharField(max_length=50)
+    race = models.ForeignKey(Race, null=True)
+    description = models.CharField(blank=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+
+class Ability(models.Model):
+    name = models.name = models.CharField(max_length=50)
+    description = models.CharField(blank=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+
+class Skill(models.Model):
+    name = models.name = models.CharField(max_length=50)
+    description = models.CharField(blank=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+
+class Trait(models.Model):
+    name = models.name = models.CharField(max_length=50)
+    description = models.CharField(blank=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
 
 
 class CharacterStatus(models.Model):
@@ -124,15 +152,35 @@ class CharacterStatus(models.Model):
 class Character(models.Model):
     name = models.CharField(max_length=100, blank=False)
     nick = models.CharField(max_length=100, null=True)
-    health = models.IntegerField(null=False)
-    mana = models.IntegerField(null=False)
-    rage = models.IntegerField(null=False)
     race = models.ForeignKey(Race, blank=False)
+    primary_class = models.ForeignKey(Class, blank=False)
+    secondary_class = models.ForeignKey(Class)
     status = models.ForeignKey(CharacterStatus)
     avatar = models.ForeignKey(Photo)
     home_world = models.ForeignKey(World, blank=False)
     scene = models.ForeignKey(Scene, null=True)
     details = JSONField(null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+
+class CharacterTraits(models.Model):
+    character = models.ForeignKey(Character, null=False)
+    trait = models.ForeignKey(Trait, null=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+
+class CharacterSkills(models.Model):
+    character = models.ForeignKey(Character, null=False)
+    skill = models.ForeignKey(Skill, null=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+
+class CharacterAbilities(models.Model):
+    character = models.ForeignKey(Character, null=False)
+    ability = models.ForeignKey(Ability, null=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
