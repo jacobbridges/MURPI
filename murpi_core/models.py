@@ -1,5 +1,19 @@
 from django.db import models
 from jsonfield import JSONField
+import hashlib
+import time
+
+# === Methods for MURPI_core models ===
+
+# To reset migrations
+# ./manage.py migrate --fake murpi_core zero
+
+
+def generate_hash_10():
+        """This function generate 10 character long hash"""
+        full_hash = hashlib.sha1()
+        full_hash.update(str(time.time()))
+        return full_hash.hexdigest()[:-10]
 
 # === Models for MURPI_core ===
 
@@ -11,6 +25,9 @@ class Photo(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return self.file_name
+
 
 class Player(models.Model):
     name = models.CharField(max_length=100, blank=False)
@@ -19,6 +36,9 @@ class Player(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class PlayerEmail(models.Model):
     player = models.ForeignKey(Player)
@@ -26,6 +46,9 @@ class PlayerEmail(models.Model):
     primary = models.BooleanField(default=False, null=False)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.email
 
 
 # Universe -> World -> Place -> Scene
@@ -40,6 +63,9 @@ class Universe(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 # World -> Place -> Scene
 class World(models.Model):
@@ -47,11 +73,15 @@ class World(models.Model):
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player, null=False)
+    is_public = models.BooleanField(default=True, null=False)
     universe = models.ForeignKey(Universe, null=False)
     thumbnail = models.ForeignKey(Photo, related_name='world_thumbnail')
     background = models.ForeignKey(Photo, related_name='world_background', null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 # Place -> Scene
@@ -66,6 +96,9 @@ class Place(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Scene(models.Model):
     name = models.CharField(max_length=40, blank=False)
@@ -75,11 +108,17 @@ class Scene(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class RoleplayStatus(models.Model):
     name = models.CharField(max_length=40)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 # A collection of scenes depicting a complete story
@@ -91,8 +130,12 @@ class Roleplay(models.Model):
     plain_rules = models.TextField(null=True)
     is_public = models.BooleanField(default=False, null=False)
     status = models.ForeignKey(RoleplayStatus, null=False)
+    details = JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
 
 
 class Race(models.Model):
@@ -105,42 +148,8 @@ class Race(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-
-class Class(models.Model):
-    name = models.CharField(max_length=50)
-    race = models.ForeignKey(Race, null=True)
-    description = models.TextField(blank=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-
-class Mastery(models.Model):
-    name = models.name = models.CharField(max_length=50)
-    race = models.ForeignKey(Race, null=True)
-    description = models.TextField(blank=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-
-class Ability(models.Model):
-    name = models.name = models.CharField(max_length=50)
-    description = models.TextField(blank=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-
-class Skill(models.Model):
-    name = models.name = models.CharField(max_length=50)
-    description = models.TextField(blank=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-
-class Trait(models.Model):
-    name = models.name = models.CharField(max_length=50)
-    description = models.TextField(blank=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
+    def __unicode__(self):
+        return self.name
 
 
 class CharacterStatus(models.Model):
@@ -148,13 +157,14 @@ class CharacterStatus(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Character(models.Model):
     name = models.CharField(max_length=100, blank=False)
     nick = models.CharField(max_length=100, null=True)
     race = models.ForeignKey(Race, blank=False)
-    primary_class = models.ForeignKey(Class, related_name='primary_class',  blank=False)
-    secondary_class = models.ForeignKey(Class, related_name='secondary_class')
     status = models.ForeignKey(CharacterStatus)
     avatar = models.ForeignKey(Photo)
     home_world = models.ForeignKey(World, blank=False)
@@ -163,26 +173,8 @@ class Character(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-
-class CharacterTraits(models.Model):
-    character = models.ForeignKey(Character, null=False)
-    trait = models.ForeignKey(Trait, null=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-
-class CharacterSkills(models.Model):
-    character = models.ForeignKey(Character, null=False)
-    skill = models.ForeignKey(Skill, null=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-
-class CharacterAbilities(models.Model):
-    character = models.ForeignKey(Character, null=False)
-    ability = models.ForeignKey(Ability, null=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
+    def __unicode__(self):
+        return self.name
 
 
 class Post(models.Model):
@@ -193,6 +185,9 @@ class Post(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
+    def __unicode__(self):
+        return "{} words posted by {} in {}".format(len(self.text.split()), self.author.name, self.scene.name)
+
 
 # Which characters are referenced in this post?
 class CharacterPost(models.Model):
@@ -201,4 +196,5 @@ class CharacterPost(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
-
+    def __unicode__(self):
+        return "ch {} -> po {}".format(self.character_id, self.post_id)
