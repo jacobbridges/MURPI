@@ -51,6 +51,32 @@ class PlayerEmail(models.Model):
         return self.email
 
 
+class RoleplayStatus(models.Model):
+    name = models.CharField(max_length=40)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
+
+
+# A collection of scenes depicting a complete story
+class Roleplay(models.Model):
+    name = models.CharField(max_length=100, blank=False)
+    short_description = models.CharField(max_length=500, null=True)
+    description = models.TextField(blank=False)
+    owner = models.ForeignKey(Player, null=False)
+    plain_rules = models.TextField(null=True)
+    is_public = models.BooleanField(default=False, null=False)
+    status = models.ForeignKey(RoleplayStatus, null=False)
+    details = JSONField(null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 # Universe -> World -> Place -> Scene
 class Universe(models.Model):
     name = models.CharField(max_length=40, blank=False)
@@ -91,6 +117,7 @@ class Place(models.Model):
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player, null=False)
     world = models.ForeignKey(World, null=False)
+    is_public = models.BooleanField(default=True, null=False)
     thumbnail = models.ForeignKey(Photo, related_name='place_thumbnail')
     background = models.ForeignKey(Photo, related_name='place_background', null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -105,32 +132,7 @@ class Scene(models.Model):
     short_description = models.CharField(max_length=500, null=True)
     owner = models.ForeignKey(Player, null=False)
     place = models.ForeignKey(Place, null=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-class RoleplayStatus(models.Model):
-    name = models.CharField(max_length=40)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-# A collection of scenes depicting a complete story
-class Roleplay(models.Model):
-    name = models.CharField(max_length=100, blank=False)
-    short_description = models.CharField(max_length=500, null=True)
-    description = models.TextField(blank=False)
-    owner = models.ForeignKey(Player, null=False)
-    plain_rules = models.TextField(null=True)
-    is_public = models.BooleanField(default=False, null=False)
-    status = models.ForeignKey(RoleplayStatus, null=False)
-    details = JSONField(null=True)
+    roleplay = models.ForeignKey(Roleplay, null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
