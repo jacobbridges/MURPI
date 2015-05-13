@@ -16,6 +16,10 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+from murpi_core import views as core_views
+
+
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^player/([0-9]+)/$', core_views.player_details)
 ]
