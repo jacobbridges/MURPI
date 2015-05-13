@@ -9,11 +9,21 @@ import time
 # ./manage.py migrate --fake murpi_core zero
 
 
-def generate_hash_10():
-        """This function generate 10 character long hash"""
+def generate_hash():
+        """
+        Generate a unique hash based on the current time
+        """
         full_hash = hashlib.sha1()
         full_hash.update(str(time.time()))
-        return full_hash.hexdigest()[:-10]
+        return full_hash.hexdigest()
+
+
+def generate_photo_path(instance, filename):
+    """
+    Generate new photo filename and path.
+    Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
+    """
+    return 'img/avatar/{0}.{1}'.format(generate_hash(), instance.file_extension)
 
 # === Models for MURPI_core ===
 
@@ -21,7 +31,9 @@ def generate_hash_10():
 
 
 class Photo(models.Model):
-    file_name = models.CharField(max_length=10)
+    file_name = models.ImageField(upload_to=generate_photo_path, width_field='width', height_field='height')
+    width = models.FloatField(null=True)
+    height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
