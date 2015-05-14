@@ -63,24 +63,22 @@ class PlayerEmail(models.Model):
         return self.email
 
 
-class RoleplayStatus(models.Model):
-    name = models.CharField(max_length=40)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.name
-
-
 # A collection of scenes depicting a complete story
 class Roleplay(models.Model):
     name = models.CharField(max_length=100, blank=False)
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
-    owner = models.ForeignKey(Player, null=False)
+    owner = models.ForeignKey(Player)
     plain_rules = models.TextField(null=True)
-    is_public = models.BooleanField(default=False, null=False)
-    status = models.ForeignKey(RoleplayStatus, null=False)
+    is_public = models.BooleanField(default=False)
+    status = models.CharField(max_length=2, choices=(
+        ('DV', 'In Development'),
+        ('OP', 'Open (Recruiting)'),
+        ('CL', 'Closed (Not Accepting Character Applications)'),
+        ('RO', 'Re-Open (Accepting New Characters)'),
+        ('FI', 'Finished'),
+        ('DD', 'Dead')
+    ), default='DV')
     details = JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
