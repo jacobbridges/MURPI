@@ -1,5 +1,4 @@
 from django.contrib import admin
-from .models import Player, PlayerEmail
+from .models import Player
 
 admin.site.register(Player)
-admin.site.register(PlayerEmail)

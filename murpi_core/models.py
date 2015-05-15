@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models, IntegrityError
+from django.contrib.auth.models import User
 from jsonfield import JSONField
 import hashlib
 import time
@@ -10,12 +11,12 @@ import time
 
 
 def generate_hash():
-        """
-        Generate a unique hash based on the current time
-        """
-        full_hash = hashlib.sha1()
-        full_hash.update(str(time.time()))
-        return full_hash.hexdigest()
+    """
+    Generate a unique hash based on the current time
+    """
+    full_hash = hashlib.sha1()
+    full_hash.update(str(time.time()))
+    return full_hash.hexdigest()
 
 
 def generate_photo_path(instance, filename):
@@ -24,6 +25,7 @@ def generate_photo_path(instance, filename):
     Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
     """
     return 'img/avatar/{0}.{1}'.format(generate_hash(), instance.file_extension)
+
 
 # === Models for MURPI_core ===
 
@@ -38,29 +40,17 @@ class Photo(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return self.file_name
+        return self.file_name.url
 
 
 class Player(models.Model):
-    name = models.CharField(max_length=100, blank=False)
-    password = models.CharField(max_length=40, blank=False)
+    user = models.OneToOneField(User)
     avatar = models.ForeignKey(Photo)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
-        return self.name
-
-
-class PlayerEmail(models.Model):
-    player = models.ForeignKey(Player)
-    email = models.CharField(max_length=100, blank=False)
-    primary = models.BooleanField(default=False, null=False)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.email
+        return self.user.username
 
 
 # A collection of scenes depicting a complete story
@@ -180,7 +170,7 @@ class Character(models.Model):
     status = models.ForeignKey(CharacterStatus)
     avatar = models.ForeignKey(Photo)
     home_world = models.ForeignKey(World, blank=False)
-    scene = models.ForeignKey(Scene, null=True)
+    latest_scene = models.ForeignKey(Scene, null=True)
     details = JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
