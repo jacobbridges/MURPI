@@ -52,6 +52,10 @@ class Player(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    @staticmethod
+    def retrieve_default_avatar():
+        return Photo.objects.get_or_create(file_name='img/avatar/default.png')
+
 
 # A collection of scenes depicting a complete story
 class Roleplay(models.Model):
