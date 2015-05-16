@@ -24,6 +24,6 @@ from murpi_core import views as core_views
 urlpatterns = [
     url(r'^admin/$', include(admin.site.urls)),
     url(r'^player/@(?P<username>[A-Za-z0-9_]+)/$', core_views.retrieve_player, name="core:player"),
-    url(r'^register/$', core_views.show_create_player),
-    url(r'^register_player/$', core_views.create_player)
+    url(r'^register/$', core_views.show_create_player, name="core:register"),
+    url(r'^register_player/$', core_views.create_player, name="core:register_player")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
