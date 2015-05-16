@@ -174,6 +174,7 @@ class Character(models.Model):
     status = models.ForeignKey(CharacterStatus)
     avatar = models.ForeignKey(Photo)
     home_world = models.ForeignKey(World, blank=False)
+    author = models.ForeignKey(Player, null=False)
     latest_scene = models.ForeignKey(Scene, null=True)
     details = JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
