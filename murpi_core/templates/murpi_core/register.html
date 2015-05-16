@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+
+    {% if error %}
+    <div id="error" style="font-family: monospace; color: red">{{ error }}</div>
+    {% endif %}
+
+    <form action="" method="post">
+        <div>
+            <label for="email">Email</label>
+            <input type="text" id="email"/>
+        </div>
+        <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" />
+        </div>
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" />
+        </div>
+        <div>
+            <input type="submit" value="Submit" />
+        </div>
+    </form>
+
+</body>
+</html>
