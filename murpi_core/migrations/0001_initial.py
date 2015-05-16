@@ -193,6 +193,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='character',
+            name='author',
+            field=models.ForeignKey(to='murpi_core.Player'),
+        ),
+        migrations.AddField(
+            model_name='character',
             name='avatar',
             field=models.ForeignKey(to='murpi_core.Photo'),
         ),
