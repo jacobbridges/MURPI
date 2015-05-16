@@ -1,4 +1,5 @@
 from django.views.decorators.http import require_safe, require_POST
+from django.contrib.auth import authenticate
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render, redirect
 from utilities.helpers import dict_has_keys
@@ -21,3 +22,21 @@ def create_player(request):
     else:
         return render(request, "player_create.html", {'error': 'Username, email or password cannot be empty.'})
 
+
+@require_POST()
+def login(request):
+    if dict_has_keys(request.POST, ('username', 'password'), check_not_empty=True):
+        user = authenticate(username=request.POST['username'], password=request.POST['password'])
+        if user is not None:
+            if user.is_active:
+                player = Player.objects.get(user=user)
+                if player is not None:
+                    return redirect(reverse("core:home"), player={'player': player})
+                else:
+                    render(request, "login.html", {'error': 'This login is not associated with a user. '
+                                                            'Please contact an administrator.'})
+            else:
+                render(request, "login.html", {'error': 'That account is disabled!'})
+        else:
+            # the authentication system was unable to verify the username and password
+            render(request, "login.html", {'error': 'That username or password is incorrect.'})
