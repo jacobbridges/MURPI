@@ -6,25 +6,30 @@
 </head>
 <body>
 
-    {% if error %}
-    <div id="error" style="font-family: monospace; color: red">{{ error }}</div>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
     {% endif %}
 
-    <form action="" method="post">
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
         <div>
             <label for="email">Email</label>
-            <input type="text" id="email"/>
+            <input type="text" id="email" name="email"/>
         </div>
         <div>
             <label for="username">Username</label>
-            <input type="text" id="username" />
+            <input type="text" id="username" name="username"/>
         </div>
         <div>
             <label for="password">Password</label>
-            <input type="password" id="password" />
+            <input type="password" id="password" name="password" />
         </div>
         <div>
-            <input type="submit" value="Submit" />
+            <input type="submit" value="Register" />
         </div>
     </form>
 

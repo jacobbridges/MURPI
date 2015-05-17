@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^register/$', core_views.show_create_player, name="show_register"),
     url(r'^register_player/$', core_views.create_player, name="register"),
     url(r'^login/$', core_views.show_login, name="show_login"),
+    url(r'^logout/$', core_views.logout, name="logout"),
     url(r'^validate_login/$', core_views.login, name="login")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

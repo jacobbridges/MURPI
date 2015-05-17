@@ -120,3 +120,7 @@ MEDIA_URL = '/media/'
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
+
+# Authorization / Permissions
+
+LOGIN_URL = '/login/'
