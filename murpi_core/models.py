@@ -1,5 +1,9 @@
 from django.db import models
+from django.db.utils import IntegrityError
 from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
+
 from jsonfield import JSONField
 import hashlib
 import time
@@ -201,3 +205,22 @@ class CharacterPost(models.Model):
 
     def __unicode__(self):
         return "ch {} -> po {}".format(self.character_id, self.post_id)
+
+
+# === Model Permissions ===
+
+# Can create universes
+try:
+    Permission.objects.create(codename='can_create_universe',
+                              name='Can Create Universe',
+                              content_type=ContentType.objects.get_for_model(Universe))
+except IntegrityError:
+    pass
+
+# Can create worlds
+try:
+    Permission.objects.create(codename='can_create_world',
+                              name='Can Create World',
+                              content_type=ContentType.objects.get_for_model(World))
+except IntegrityError:
+    pass
