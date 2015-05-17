@@ -7,7 +7,8 @@ def dict_has_keys(d, keys, check_not_empty=False):
             if check_not_empty is False:
                 return True
             else:
-                if all([True for k in keys if d[k] != '' or d[k] is not None]):
+                if all([True if d[k] and d[k] is not None else False for k in keys]):
+                    print [True if not d[k] or d[k] is not None else False for k in keys]
                     return True
                 else:
                     return False
