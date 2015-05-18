@@ -7,24 +7,8 @@ from django.contrib.messages import (debug, info, success, warning, error)
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 
-from .utils.helpers import dict_has_keys
-from .models import Player, Photo
-
-
-@require_safe
-def retrieve_player(request, username):
-    user = get_object_or_404(User, username=username)
-    player = get_object_or_404(Player, user=user)
-    return render(request, "murpi_core/player.html", {'player': player})
-
-
-@require_safe
-def retrieve_player_characters(request, username):
-    players = Player.objects.filter(user__username=username)
-    if len(players) == 1:
-        return render(request, "murpi_core/characters.html", {'player': players[0]})
-    else:
-        return page_not_found(request)
+from .utils.helpers import dict_has_keys, handle_uploaded_files
+from .models import Player, Photo, Universe, World
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -86,8 +70,52 @@ def login(request):
         return page_not_found(request)
 
 
-
 @require_safe
 def logout(request):
     django_logout(request)
     return redirect(reverse('login'))
+
+
+@require_safe
+def retrieve_player(request, username):
+    user = get_object_or_404(User, username=username)
+    player = get_object_or_404(Player, user=user)
+    return render(request, "murpi_core/player.html", {'player': player})
+
+
+@require_safe
+def retrieve_player_characters(request, username):
+    players = Player.objects.filter(user__username=username)
+    if len(players) == 1:
+        return render(request, "murpi_core/characters.html", {'player': players[0]})
+    else:
+        return page_not_found(request)
+
+
+@require_http_methods(['GET', 'POST', 'HEAD'])
+def create_world(request):
+    if request.method in ['GET', 'HEAD']:
+        return render(request, "murpi_core/create_world.html", {'universes': Universe.objects.all()})
+    elif request.method == 'POST':
+        if dict_has_keys(request.POST, ('author', 'name', 'universe_id', 'is_public', 'description')) and \
+                        'thumbnail' in request.FILES and 'background' in request.FILES:
+            author = Player.objects.get(user__username=request.POST['author'])
+            universe = Universe.objects.get(pk=request.POST['universe_id'])
+            thumbnail = Photo(file_name=request.FILES['thumbnail'])
+            thumbnail.save()
+            background = Photo(file_name=request.FILES['background'])
+            world = World.objects.create(owner=author, name=request.POST['name'], universe=universe,
+                                         description=request.POST['description'],
+                                         is_public=True if request.POST['is_public'] == 'on' else False,
+                                         thumbnail=thumbnail, background=background)
+            return redirect(reverse('world', kwargs={'world_name': world.name}))
+        else:
+            return page_not_found(request)
+    else:
+        return page_not_found(request)
+
+
+@require_safe
+def retrieve_world(request, world_name):
+    world = get_object_or_404(World, name=world_name)
+    return render(request, "murpi_core/world.html", {'world': world})

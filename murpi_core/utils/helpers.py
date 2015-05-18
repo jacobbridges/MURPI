@@ -1,4 +1,5 @@
 from django.http.request import QueryDict
+from MURPI.settings import MEDIA_ROOT
 
 
 def dict_has_keys(d, keys, check_not_empty=False):
@@ -16,3 +17,9 @@ def dict_has_keys(d, keys, check_not_empty=False):
             return False
     else:
         raise TypeError('expected types: d=QueryDict, keys=tuple')
+
+
+def handle_uploaded_files(f, path_to_file):
+    with open(MEDIA_ROOT + '/' + path_to_file, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)

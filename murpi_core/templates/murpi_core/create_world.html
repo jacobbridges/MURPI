@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>New World</title>
+</head>
+<body>
+
+    <h2>Create a New World</h2>
+
+    {% if request.user.is_anonymous %}
+    <h4>You must be logged in to create a world!</h4>
+    {% endif %}
+
+    <form method="post" action="{% url 'create_world' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if request.user.is_anonymous %}
+        <fieldset disabled="disabled">
+        {% else %}
+        <fieldset>
+            <input type="hidden" name="author" value="{{ request.user.username }}" />
+        {% endif %}
+
+        <div>
+            <label for="world_name">Name</label>
+            <input type="text" name="name" id="world_name" />
+        </div>
+
+        <div>
+            <label for="universe">Universe</label>
+            <select name="universe_id" id="universe">
+                <option disabled="disabled" selected>- Select -</option>
+                {% for universe in universes %}
+                <option value="{{ universe.id }}">{{ universe.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="is_public">Public?</label>
+            <input type="checkbox" name="is_public" id="is_public" checked="true" />
+        </div>
+
+        <div>
+            <label for="world_thumbnail">Thumbnail</label>
+            <input type="file" name="thumbnail" id="world_thumbnail" accept="image/*" />
+        </div>
+
+        <div>
+            <label for="world_background">Background</label>
+            <input type="file" name="background" id="world_background" accept="image/*" />
+        </div>
+
+        <div>
+            <label for="world_description">Description</label>
+            <textarea name="description" id="world_description"></textarea>
+        </div>
+
+        <div>
+            <input type="submit" value="Create" />
+        </div>
+
+        </fieldset>
+    </form>
+
+</body>
+</html>
