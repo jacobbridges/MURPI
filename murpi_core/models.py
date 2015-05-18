@@ -28,7 +28,7 @@ def generate_photo_path(instance, filename):
     Generate new photo filename and path.
     Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
     """
-    return 'img/avatar/{0}.{1}'.format(generate_hash(), instance.file_extension)
+    return 'img/avatar/{0}.{1}'.format(generate_hash(), filename.split('.')[-1])
 
 
 # === Models for MURPI_core ===
