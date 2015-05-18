@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{ player.user.username}}'s Characters</title>
+</head>
+<body>
+
+    <h2>{{ player.user.username}}'s Characters</h2>
+
+    {% for character in player.character_set.all %}
+    <div>
+        <img src="{{ character.avatar.file_name.url }}" style="width:auto; height:60px;">
+        <span class="character-name">{{ character.name }}</span>
+        <span class="character-status">{{ character.status.name }}</span>
+        <span class="character-race">{{ character.race.name }}</span>
+        <span class="character-home-world">{{ character.home_world.name }}</span>
+    </div>
+    {% endfor %}
+
+
+</body>
+</html>

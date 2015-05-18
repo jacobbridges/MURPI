@@ -18,6 +18,15 @@ def retrieve_player(request, username):
     return render(request, "murpi_core/player.html", {'player': player})
 
 
+@require_safe
+def retrieve_player_characters(request, username):
+    players = Player.objects.filter(user__username=username)
+    if len(players) == 1:
+        return render(request, "murpi_core/characters.html", {'player': players[0]})
+    else:
+        return page_not_found(request)
+
+
 @require_http_methods(['GET', 'POST', 'HEAD'])
 def register(request):
     if request.method in ['GET', 'HEAD']:
