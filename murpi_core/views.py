@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 
 from .utils.helpers import dict_has_keys, handle_uploaded_files
-from .models import Player, Photo, Universe, World
+from .models import Player, Photo, Universe, World, Place
+from .forms import PlaceForm
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -119,3 +120,36 @@ def create_world(request):
 def retrieve_world(request, world_name):
     world = get_object_or_404(World, name=world_name)
     return render(request, "murpi_core/world.html", {'world': world})
+
+
+@require_http_methods(['GET', 'POST', 'HEAD'])
+def create_place(request, universe_name, world_name):
+    context_dict = {'universe_name': universe_name, 'world_name': world_name}
+    if request.method in ['GET', 'HEAD']:
+        context_dict['form'] = PlaceForm()
+        return render(request, "murpi_core/create_place.html", context_dict)
+    elif request.method == 'POST':
+        form = PlaceForm(request.POST, request.FILES)
+        if form.is_valid():
+            author = Player.objects.get(user__username=request.user.username)
+            world = World.objects.get(name=world_name)
+            thumbnail = Photo(file_name=form.cleaned_data['thumbnail'])
+            thumbnail.save()
+            place = Place.objects.create(owner=author, name=form.cleaned_data['name'], world=world,
+                                         description=form.cleaned_data['description'],
+                                         is_public=form.cleaned_data['is_public'], thumbnail=thumbnail)
+            context_dict['place_name'] = place.name
+            return redirect(reverse('place', kwargs=context_dict))
+        else:
+            context_dict['form'] = form
+            return render(request, "murpi_core/create_place.html", context_dict)
+    else:
+        page_not_found(request)
+
+
+@require_safe
+def retrieve_place(request, universe_name, world_name, place_name):
+    context_dict = {'universe_name': universe_name,
+                    'world_name': world_name,
+                    'place': get_object_or_404(Place, name=place_name)}
+    return render(request, "murpi_core/place.html", context_dict)
