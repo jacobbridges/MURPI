@@ -97,9 +97,9 @@ def create_world(request):
     if request.method in ['GET', 'HEAD']:
         return render(request, "murpi_core/create_world.html", {'universes': Universe.objects.all()})
     elif request.method == 'POST':
-        if dict_has_keys(request.POST, ('author', 'name', 'universe_id', 'is_public', 'description')) and \
-                        'thumbnail' in request.FILES and 'background' in request.FILES:
-            author = Player.objects.get(user__username=request.POST['author'])
+        if dict_has_keys(request.POST, ('name', 'universe_id', 'is_public', 'description')) and \
+           'thumbnail' in request.FILES and 'background' in request.FILES:
+            author = Player.objects.get(user__username=request.user.username)
             universe = Universe.objects.get(pk=request.POST['universe_id'])
             thumbnail = Photo(file_name=request.FILES['thumbnail'])
             thumbnail.save()
