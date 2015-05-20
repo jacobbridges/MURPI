@@ -12,7 +12,7 @@
     <h4>You must be logged in to create a place!</h4>
     {% endif %}
 
-    <form method="post" action="{% url 'create_place' universe_name=universe_name world_name=world_name %}" enctype="multipart/form-data">
+    <form method="post" action="{% url 'create_place' world_id=world_id %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         {{ form.non_field_errors }}

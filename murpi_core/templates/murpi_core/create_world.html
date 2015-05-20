@@ -12,7 +12,7 @@
     <h4>You must be logged in to create a world!</h4>
     {% endif %}
 
-    <form method="post" action="{% url 'create_world' %}" enctype="multipart/form-data">
+    <form method="post" action="{% url 'create_world' universe_id=universe_id %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         {% if request.user.is_anonymous %}
@@ -26,15 +26,16 @@
             <input type="text" name="name" id="world_name" />
         </div>
 
-        <div>
-            <label for="universe">Universe</label>
-            <select name="universe_id" id="universe">
-                <option disabled="disabled" selected>- Select -</option>
-                {% for universe in universes %}
-                <option value="{{ universe.id }}">{{ universe.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
+{#        Keeping this code just in case I need something similar later. Cuz you know...DRY. #}
+{#        <div>#}
+{#            <label for="universe">Universe</label>#}
+{#            <select name="universe_id" id="universe">#}
+{#                <option disabled="disabled" selected>- Select -</option>#}
+{#                {% for universe in universes %}#}
+{#                <option value="{{ universe.id }}">{{ universe.name }}</option>#}
+{#                {% endfor %}#}
+{#            </select>#}
+{#        </div>#}
 
         <div>
             <label for="is_public">Public?</label>

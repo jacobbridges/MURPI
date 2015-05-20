@@ -94,22 +94,24 @@ def retrieve_player_characters(request, username):
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
-def create_world(request):
+def create_world(request, universe_id):
     if request.method in ['GET', 'HEAD']:
-        return render(request, "murpi_core/create_world.html", {'universes': Universe.objects.all()})
+        return render(request, "murpi_core/create_world.html", {'universe_id': universe_id})
     elif request.method == 'POST':
-        if dict_has_keys(request.POST, ('name', 'universe_id', 'is_public', 'description')) and \
+        # TODO: Convert to Django form for more validation
+        if dict_has_keys(request.POST, ('name', 'is_public', 'description')) and \
            'thumbnail' in request.FILES and 'background' in request.FILES:
             author = Player.objects.get(user__username=request.user.username)
-            universe = Universe.objects.get(pk=request.POST['universe_id'])
+            universe = Universe.objects.get(pk=universe_id)
             thumbnail = Photo(file_name=request.FILES['thumbnail'])
             thumbnail.save()
             background = Photo(file_name=request.FILES['background'])
+            background.save()
             world = World.objects.create(owner=author, name=request.POST['name'], universe=universe,
                                          description=request.POST['description'],
                                          is_public=True if request.POST['is_public'] == 'on' else False,
                                          thumbnail=thumbnail, background=background)
-            return redirect(reverse('world', kwargs={'world_name': world.name}))
+            return redirect(reverse('world', kwargs={'world_id': world.id}))
         else:
             return page_not_found(request)
     else:
@@ -117,14 +119,14 @@ def create_world(request):
 
 
 @require_safe
-def retrieve_world(request, world_name):
-    world = get_object_or_404(World, name=world_name)
+def retrieve_world(request, world_id):
+    world = get_object_or_404(World, pk=world_id)
     return render(request, "murpi_core/world.html", {'world': world})
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
-def create_place(request, universe_name, world_name):
-    context_dict = {'universe_name': universe_name, 'world_name': world_name}
+def create_place(request, world_id):
+    context_dict = {'world_id': world_id}
     if request.method in ['GET', 'HEAD']:
         context_dict['form'] = PlaceForm()
         return render(request, "murpi_core/create_place.html", context_dict)
@@ -132,24 +134,21 @@ def create_place(request, universe_name, world_name):
         form = PlaceForm(request.POST, request.FILES)
         if form.is_valid():
             author = Player.objects.get(user__username=request.user.username)
-            world = World.objects.get(name=world_name)
+            world = World.objects.get(pk=world_id)
             thumbnail = Photo(file_name=form.cleaned_data['thumbnail'])
             thumbnail.save()
             place = Place.objects.create(owner=author, name=form.cleaned_data['name'], world=world,
                                          description=form.cleaned_data['description'],
                                          is_public=form.cleaned_data['is_public'], thumbnail=thumbnail)
-            context_dict['place_name'] = place.name
-            return redirect(reverse('place', kwargs=context_dict))
+            return redirect(reverse('place', kwargs={'place_id': place.id}))
         else:
             context_dict['form'] = form
             return render(request, "murpi_core/create_place.html", context_dict)
     else:
-        page_not_found(request)
+        return page_not_found(request)
 
 
 @require_safe
-def retrieve_place(request, universe_name, world_name, place_name):
-    context_dict = {'universe_name': universe_name,
-                    'world_name': world_name,
-                    'place': get_object_or_404(Place, name=place_name)}
-    return render(request, "murpi_core/place.html", context_dict)
+def retrieve_place(request, place_id):
+    place = Place.objects.get(pk=place_id)
+    return render(request, "murpi_core/place.html", {'place': place})

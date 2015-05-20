@@ -26,12 +26,10 @@ urlpatterns = [
     url(r'^player/@(?P<username>[A-Za-z0-9_]+)/$', core_views.retrieve_player, name="player"),
     url(r'^player/@(?P<username>[A-Za-z0-9_]+)/characters/$', core_views.retrieve_player_characters,
         name="player_characters"),
-    url(r'^create_world/$', core_views.create_world, name="create_world"),
-    url(r'^world/(?P<world_name>[%A-Za-z0-9_ ]+)/$', core_views.retrieve_world, name="world"),
-    url(r'^universe/@(?P<universe_name>[%A-Za-z0-9_ ]+)/world/@(?P<world_name>[%A-Za-z0-9_ ]+)/place/new/$',
-        core_views.create_place, name="create_place"),
-    url(r'^universe/@(?P<universe_name>[%A-Za-z0-9_ ]+)/world/@(?P<world_name>[%A-Za-z0-9_ ]+)/place/@(?P<place_name>[%'
-        r'A-Za-z0-9_ ]+)/$', core_views.retrieve_place, name="place"),
+    url(r'^universe/(?P<universe_id>[0-9]+)/worlds/create/$', core_views.create_world, name="create_world"),
+    url(r'^world/(?P<world_id>[0-9]+)/$', core_views.retrieve_world, name="world"),
+    url(r'^world/(?P<world_id>[0-9]+)/places/create/$', core_views.create_place, name="create_place"),
+    url(r'^place/(?P<place_id>[0-9]+)/$', core_views.retrieve_place, name="place"),
     url(r'^register/$', core_views.register, name="register"),
     url(r'^login/$', core_views.login, name="login"),
     url(r'^logout/$', core_views.logout, name="logout")
