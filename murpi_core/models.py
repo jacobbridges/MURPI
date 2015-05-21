@@ -210,17 +210,11 @@ class CharacterPost(models.Model):
 # === Model Permissions ===
 
 # Can create universes
-try:
-    Permission.objects.create(codename='can_create_universe',
-                              name='Can Create Universe',
-                              content_type=ContentType.objects.get_for_model(Universe))
-except IntegrityError:
-    pass
+# Permission.objects.create(codename='can_create_universe',
+#                           name='Can Create Universe',
+#                           content_type=ContentType.objects.get_for_model(Universe))
 
 # Can create worlds
-try:
-    Permission.objects.create(codename='can_create_world',
-                              name='Can Create World',
-                              content_type=ContentType.objects.get_for_model(World))
-except IntegrityError:
-    pass
+# Permission.objects.create(codename='can_create_world',
+#                         name='Can Create World',
+#                         content_type=ContentType.objects.get_for_model(World))
