@@ -10,7 +10,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from .utils.helpers import dict_has_keys
 from .models import Player, Photo, Universe, World, Place
-from .forms import PlaceForm
+from .forms import PlaceForm, WorldForm
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -91,28 +91,31 @@ def retrieve_player_characters(request, username):
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
-# FOR SOME REASON NOT WORKING WITH POST..
 def create_world(request, universe_id):
     universe = get_object_or_404(Universe, pk=universe_id)
     context_dict = {'universe_id': universe_id}
     if request.method in ['GET', 'HEAD']:
+        context_dict['form'] = WorldForm()
         return render(request, "murpi_core/create_world.html", context_dict)
     elif request.method == 'POST':
-        # TODO: Convert to Django form for more validation
-        if dict_has_keys(request.POST, ('name', 'is_public', 'description')) and \
-           'thumbnail' in request.FILES and 'background' in request.FILES:
+        form = WorldForm(request.POST, request.FILES)
+        if form.is_valid():
             author = Player.objects.get(user__username=request.user.username)
-            thumbnail = Photo(file_name=request.FILES['thumbnail'])
+            thumbnail = Photo(file_name=form.cleaned_data['thumbnail'])
             thumbnail.save()
-            background = Photo(file_name=request.FILES['background'])
-            background.save()
-            world = World.objects.create(owner=author, name=request.POST['name'], universe=universe,
-                                         description=request.POST['description'],
-                                         is_public=True if request.POST['is_public'] == 'on' else False,
-                                         thumbnail=thumbnail, background=background)
+            if form.cleaned_data['background']:
+                background = Photo(file_name=form.cleaned_data['background'])
+                background.save()
+            else:
+                background = None
+            world = World.objects.create(owner=author, name=form.cleaned_data['name'], universe=universe,
+                                         description=form.cleaned_data['description'],
+                                         is_public=form.cleaned_data['is_public'], thumbnail=thumbnail,
+                                         background=background)
             return redirect(reverse('world', kwargs={'world_id': world.id}))
         else:
-            return page_not_found(request)
+            context_dict['form'] = form
+            return render(request, "murpi_core/create_world.html", context_dict)
     else:
         return page_not_found(request)
 

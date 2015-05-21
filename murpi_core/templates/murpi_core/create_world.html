@@ -15,6 +15,8 @@
     <form method="post" action="{% url 'create_world' universe_id=universe_id %}" enctype="multipart/form-data">
         {% csrf_token %}
 
+        {{ form.non_field_errors }}
+
         {% if request.user.is_anonymous %}
         <fieldset disabled="disabled">
         {% else %}
@@ -22,8 +24,9 @@
         {% endif %}
 
         <div>
-            <label for="world_name">Name</label>
-            <input type="text" name="name" id="world_name" />
+            <div>{{ form.name.errors }}</div>
+            <label for="{{ form.name.id_for_label }}">Name: </label>
+            {{ form.name }}
         </div>
 
 {#        Keeping this code just in case I need something similar later. Cuz you know...DRY. #}
@@ -38,23 +41,27 @@
 {#        </div>#}
 
         <div>
-            <label for="is_public">Public?</label>
-            <input type="checkbox" name="is_public" id="is_public" checked="true" />
+            <div>{{ form.is_public.errors }}</div>
+            <label for="{{ form.is_public.id_for_label }}">Public? </label>
+            {{ form.is_public }}
         </div>
 
         <div>
-            <label for="world_thumbnail">Thumbnail</label>
-            <input type="file" name="thumbnail" id="world_thumbnail" accept="image/*" />
+            <div>{{ form.thumbnail.errors }}</div>
+            <label for="{{ form.thumnail.id_for_label }}">Thumbnail: </label>
+            {{ form.thumbnail }}
         </div>
 
         <div>
-            <label for="world_background">Background</label>
-            <input type="file" name="background" id="world_background" accept="image/*" />
+            <div>{{ form.background.errors }}</div>
+            <label for="{{ form.background.id_for_label }}">Background: </label>
+            {{ form.background }}
         </div>
 
         <div>
-            <label for="world_description">Description</label>
-            <textarea name="description" id="world_description"></textarea>
+            <div>{{ form.description.errors }}</div>
+            <label for="{{ form.description.id_for_label }}">Description: </label>
+            {{ form.description }}
         </div>
 
         <div>
