@@ -6,8 +6,9 @@ from django.views.defaults import page_not_found
 from django.contrib.messages import (debug, info, success, warning, error)
 from django.contrib.auth.models import User
 from django.db import IntegrityError
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .utils.helpers import dict_has_keys, handle_uploaded_files
+from .utils.helpers import dict_has_keys
 from .models import Player, Photo, Universe, World, Place
 from .forms import PlaceForm
 
@@ -79,30 +80,28 @@ def logout(request):
 
 @require_safe
 def retrieve_player(request, username):
-    user = get_object_or_404(User, username=username)
-    player = get_object_or_404(Player, user=user)
+    player = get_object_or_404(Player, user__username=username)
     return render(request, "murpi_core/player.html", {'player': player})
 
 
 @require_safe
 def retrieve_player_characters(request, username):
-    players = Player.objects.filter(user__username=username)
-    if len(players) == 1:
-        return render(request, "murpi_core/characters.html", {'player': players[0]})
-    else:
-        return page_not_found(request)
+    player = get_object_or_404(Player, user__username=username)
+    return render(request, "murpi_core/characters.html", {'player': player})
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
+# FOR SOME REASON NOT WORKING WITH POST..
 def create_world(request, universe_id):
+    universe = get_object_or_404(Universe, pk=universe_id)
+    context_dict = {'universe_id': universe_id}
     if request.method in ['GET', 'HEAD']:
-        return render(request, "murpi_core/create_world.html", {'universe_id': universe_id})
+        return render(request, "murpi_core/create_world.html", context_dict)
     elif request.method == 'POST':
         # TODO: Convert to Django form for more validation
         if dict_has_keys(request.POST, ('name', 'is_public', 'description')) and \
            'thumbnail' in request.FILES and 'background' in request.FILES:
             author = Player.objects.get(user__username=request.user.username)
-            universe = Universe.objects.get(pk=universe_id)
             thumbnail = Photo(file_name=request.FILES['thumbnail'])
             thumbnail.save()
             background = Photo(file_name=request.FILES['background'])
@@ -126,6 +125,7 @@ def retrieve_world(request, world_id):
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
 def create_place(request, world_id):
+    world = get_object_or_404(World, pk=world_id)
     context_dict = {'world_id': world_id}
     if request.method in ['GET', 'HEAD']:
         context_dict['form'] = PlaceForm()
@@ -134,7 +134,6 @@ def create_place(request, world_id):
         form = PlaceForm(request.POST, request.FILES)
         if form.is_valid():
             author = Player.objects.get(user__username=request.user.username)
-            world = World.objects.get(pk=world_id)
             thumbnail = Photo(file_name=form.cleaned_data['thumbnail'])
             thumbnail.save()
             place = Place.objects.create(owner=author, name=form.cleaned_data['name'], world=world,
@@ -150,5 +149,22 @@ def create_place(request, world_id):
 
 @require_safe
 def retrieve_place(request, place_id):
-    place = Place.objects.get(pk=place_id)
+    place = get_object_or_404(Player, pk=place_id)
     return render(request, "murpi_core/place.html", {'place': place})
+
+
+@require_safe
+def retrieve_worlds(request, universe_id):
+    universe = get_object_or_404(Universe, pk=universe_id)
+    worlds = World.objects.all().filter(universe_id=universe_id)
+    paginator = Paginator(worlds, 10)
+    page = request.GET.get('page')
+    try:
+        worlds_sub = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        worlds_sub = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        worlds_sub = paginator.page(paginator.num_pages)
+    return render(request, "murpi_core/worlds.html", {'universe': universe, 'worlds': worlds_sub})
