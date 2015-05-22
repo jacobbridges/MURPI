@@ -1,8 +1,8 @@
 from django.views.decorators.http import require_safe, require_POST, require_http_methods
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.core.urlresolvers import reverse
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
-from django.views.defaults import page_not_found
 from django.contrib.messages import (debug, info, success, warning, error)
 from django.contrib.auth.models import User
 from django.db import IntegrityError
@@ -36,7 +36,7 @@ def register(request):
             error(request, 'Username ' + request.POST['username'] + ' is taken.')
             return redirect(reverse("register"))
     else:
-        return page_not_found(request)
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -69,7 +69,7 @@ def login(request):
             error(request, 'Username or password cannot be empty')
             return redirect(reverse("login"))
     else:
-        return page_not_found(request)
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
 
 
 @require_safe
@@ -117,7 +117,7 @@ def create_world(request, universe_id):
             context_dict['form'] = form
             return render(request, "murpi_core/create_world.html", context_dict)
     else:
-        return page_not_found(request)
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
 
 
 @require_safe
@@ -147,7 +147,7 @@ def create_place(request, world_id):
             context_dict['form'] = form
             return render(request, "murpi_core/create_place.html", context_dict)
     else:
-        return page_not_found(request)
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
 
 
 @require_safe
