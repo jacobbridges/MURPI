@@ -175,11 +175,11 @@ class Character(models.Model):
     avatar = models.ForeignKey(Photo)
     home_world = models.ForeignKey(World, blank=False)
     description = models.TextField(null=True)
-    author = models.ForeignKey(Player)
+    author = models.ForeignKey(Player, related_name='character_author')
     details = JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    modified_by = models.ForeignKey(Player, null=True)
+    modified_by = models.ForeignKey(Player, null=True, related_name='character_modified_by')
 
     def __unicode__(self):
         return self.name
@@ -187,12 +187,12 @@ class Character(models.Model):
 
 class RoleplayPost(models.Model):
     text = models.TextField(blank=False)
-    author = models.ForeignKey(Player)
+    author = models.ForeignKey(Player, related_name='rp_post_author')
     character = models.ForeignKey(Character)
     scene = models.ForeignKey(Scene)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    modified_by = models.ForeignKey(Player, null=True)
+    modified_by = models.ForeignKey(Player, null=True, related_name='rp_post_modified_by')
 
     def __unicode__(self):
         return "{} words posted by {} in {}".format(len(self.text.split()), self.author.user.username, self.scene.name)
@@ -227,11 +227,11 @@ class Discussion(models.Model):
 
 class DiscussionPost(models.Model):
     text = models.TextField(blank=False)
-    author = models.ForeignKey(Player)
+    author = models.ForeignKey(Player, related_name='ds_post_author')
     discussion = models.ForeignKey(Discussion)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
-    modified_by = models.ForeignKey(Player, null=True)
+    modified_by = models.ForeignKey(Player, null=True, related_name='ds_post_modified_by')
 
     def __unicode__(self):
         return "{} words posted by {} in {}".format(len(self.text.split()), self.author.user.username, self.discussion.name)
