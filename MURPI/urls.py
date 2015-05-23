@@ -26,6 +26,8 @@ urlpatterns = [
     url(r'^player/@(?P<username>[A-Za-z0-9_]+)/$', core_views.retrieve_player, name="player"),
     url(r'^player/@(?P<username>[A-Za-z0-9_]+)/characters/$', core_views.retrieve_player_characters,
         name="player_characters"),
+    url(r'^universe/(?P<universe_id>[0-9]+)/$', core_views.retrieve_universe, name="universe"),
+    url(r'^universes/create/$', core_views.create_universe, name="create_universe"),
     url(r'^universe/(?P<universe_id>[0-9]+)/worlds/$', core_views.retrieve_worlds, name="worlds"),
     url(r'^universe/(?P<universe_id>[0-9]+)/worlds/create/$', core_views.create_world, name="create_world"),
     url(r'^world/(?P<world_id>[0-9]+)/$', core_views.retrieve_world, name="world"),

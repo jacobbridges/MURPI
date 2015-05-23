@@ -8,10 +8,10 @@ from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND, DEFAULT_THUMBNAIL
+from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND
 from .utils.helpers import dict_has_keys
 from .models import Player, Universe, World, Place
-from .forms import PlaceForm, WorldForm
+from .forms import PlaceForm, WorldForm, UniverseForm
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -96,6 +96,30 @@ def retrieve_player(request, username):
 def retrieve_player_characters(request, username):
     player = get_object_or_404(Player, user__username=username)
     return render(request, "murpi_core/characters.html", {'player': player})
+
+
+@require_http_methods(['GET', 'POST', 'HEAD'])
+def create_universe(request):
+    if request.method in ['GET', 'HEAD']:
+        return render(request, "murpi_core/create_universe.html", {'form': UniverseForm()})
+    elif request.method == 'POST':
+        form = UniverseForm(request.POST, request.FILES)
+        if form.is_valid():
+            universe = form.save(commit=False)
+            universe.owner = Player.objects.get(user__username=request.user.username)
+            universe.save()
+            return redirect(reverse('universe', kwargs={'universe_id': universe.id}))
+        else:
+            print dir(form)
+            return render(request, "murpi_core/create_universe.html", {'form': form})
+    else:
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
+
+
+@require_safe
+def retrieve_universe(request, universe_id):
+    universe = Universe.objects.get(pk=universe_id)
+    return render(request, "murpi_core/universe.html", {'universe': universe})
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
