@@ -179,32 +179,62 @@ class Character(models.Model):
     details = JSONField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+    modified_by = models.ForeignKey(Player, null=True)
 
     def __unicode__(self):
         return self.name
 
 
-class Post(models.Model):
+class RoleplayPost(models.Model):
     text = models.TextField(blank=False)
     author = models.ForeignKey(Player)
     character = models.ForeignKey(Character)
     scene = models.ForeignKey(Scene)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+    modified_by = models.ForeignKey(Player, null=True)
 
     def __unicode__(self):
-        return "{} words posted by {} in {}".format(len(self.text.split()), self.author.name, self.scene.name)
+        return "{} words posted by {} in {}".format(len(self.text.split()), self.author.user.username, self.scene.name)
 
 
-# Which characters are referenced in this post?
-class CharacterPost(models.Model):
+# Which characters are referenced in a roleplay post?
+class CharacterRoleplayPost(models.Model):
     character = models.ForeignKey(Character)
-    post = models.ForeignKey(Post)
+    post = models.ForeignKey(RoleplayPost)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return "ch {} -> po {}".format(self.character_id, self.post_id)
+
+
+class Discussion(models.Model):
+    name = models.CharField(max_length=100, blank=False)
+    owner = models.ForeignKey(Player)
+    status = models.CharField(max_length=2, choices=(
+        ('OP', 'Open'),
+        ('LK', 'Locked'),
+        ('CL', 'Closed')
+    ), default='OP')
+    roleplay = models.ForeignKey(Roleplay, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return "{}'s {} discussion for {}".format(self.owner.user.username, self.status, self.roleplay.name)
+
+
+class DiscussionPost(models.Model):
+    text = models.TextField(blank=False)
+    author = models.ForeignKey(Player)
+    discussion = models.ForeignKey(Discussion)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_modified = models.DateTimeField(auto_now=True)
+    modified_by = models.ForeignKey(Player, null=True)
+
+    def __unicode__(self):
+        return "{} words posted by {} in {}".format(len(self.text.split()), self.author.user.username, self.discussion.name)
 
 
 # === Model Permissions ===
