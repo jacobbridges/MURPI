@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 
+from MURPI.settings import MEDIA_ROOT
 from jsonfield import JSONField
 import hashlib
 import time
@@ -98,7 +99,7 @@ class Universe(models.Model):
     thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
     thumbnail_width = models.FloatField(null=True)
     thumbnail_height = models.FloatField(null=True)
-    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height')
+    background = models.ImageField(upload_to=generate_background_path, null=True, blank=True, width_field='background_width', height_field='background_height', default=MEDIA_ROOT+'/img/background/default.jpg')
     background_width = models.FloatField(null=True)
     background_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -119,7 +120,7 @@ class World(models.Model):
     thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
     thumbnail_width = models.FloatField(null=True)
     thumbnail_height = models.FloatField(null=True)
-    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height')
+    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height', default=MEDIA_ROOT+'/img/background/default.jpg')
     background_width = models.FloatField(null=True)
     background_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -127,6 +128,9 @@ class World(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        unique_together = ('name', 'universe',)
 
 
 # Place -> Scene
@@ -140,7 +144,7 @@ class Place(models.Model):
     thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
     thumbnail_width = models.FloatField(null=True)
     thumbnail_height = models.FloatField(null=True)
-    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height')
+    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height', default=MEDIA_ROOT+'/img/background/default.jpg')
     background_width = models.FloatField(null=True)
     background_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -148,6 +152,9 @@ class Place(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        unique_together = ('name', 'world',)
 
 
 class Scene(models.Model):
