@@ -68,7 +68,7 @@
 
     {% for world in worlds %}
     <div class="row">
-        <img class="thumb"  src="{{ world.thumbnail.file_name.url }}">
+        <img class="thumb"  src="{{ world.thumbnail.url }}">
         <span class="name">{{ world.name }}</span>
         <span class="desc">{{ world.description|truncatewords:40 }}</span>
         <span class="num_places">{{ world.place_set.count }}</span>

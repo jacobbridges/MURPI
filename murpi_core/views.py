@@ -1,23 +1,28 @@
 from django.views.decorators.http import require_safe, require_POST, require_http_methods
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpResponseServerError
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.messages import (debug, info, success, warning, error)
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND, DEFAULT_THUMBNAIL
 from .utils.helpers import dict_has_keys
-from .models import Player, Photo, Universe, World, Place
+from .models import Player, Universe, World, Place
 from .forms import PlaceForm, WorldForm
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
 def register(request):
     if request.method in ['GET', 'HEAD']:
-        if request.user.is_authenticated() and request.user.player:
-            return redirect(reverse('player', kwargs={'username': request.user.username}))
+        if request.user.is_authenticated():
+            try:
+                player = request.user.player
+                return redirect(reverse('player', kwargs={'username': player.user.username}))
+            except Exception:
+                return HttpResponseServerError("<h1>Your user is not associated with a player!</h1>")
         else:
             return render(request, 'murpi_core/register.html')
     elif request.method == 'POST':
@@ -25,8 +30,7 @@ def register(request):
             if dict_has_keys(request.POST, ('username', 'email', 'password',), check_not_empty=True):
                 User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'])
                 new_user = User.objects.get(username=request.POST['username'])
-                default_avatar = Photo.objects.get(file_name='img/avatar/default.png')
-                Player.objects.create(avatar=default_avatar, user=new_user)
+                Player.objects.create(avatar=DEFAULT_AVATAR, user=new_user)
                 success(request, "You successfully created a player! Now please login.")
                 return redirect(reverse("login"))
             else:
@@ -42,10 +46,14 @@ def register(request):
 @require_http_methods(['GET', 'POST', 'HEAD'])
 def login(request):
     if request.method in ['GET', 'HEAD']:
-        if request.user.is_authenticated() and request.user.player:
-            return redirect(reverse('player', kwargs={'username': request.user.username}))
+        if request.user.is_authenticated():
+            try:
+                player = Player.objects.get(user=request.user)
+                return redirect(reverse('player', kwargs={'username': player.user.username}))
+            except Exception:
+                return HttpResponseServerError("<h1>Your user is not associated with a player!</h1>")
         else:
-            return render(request, "murpi_core/login.html")
+            return render(request, 'murpi_core/login.html')
     elif request.method == 'POST':
         if dict_has_keys(request.POST, ('username', 'password'), check_not_empty=True):
             user = authenticate(username=request.POST['username'], password=request.POST['password'])
@@ -101,16 +109,13 @@ def create_world(request, universe_id):
         form = WorldForm(request.POST, request.FILES)
         if form.is_valid():
             author = Player.objects.get(user__username=request.user.username)
-            thumbnail = Photo(file_name=form.cleaned_data['thumbnail'])
-            thumbnail.save()
             if form.cleaned_data['background']:
-                background = Photo(file_name=form.cleaned_data['background'])
-                background.save()
+                background = form.cleaned_data['background']
             else:
-                background = None
+                background = DEFAULT_BACKGROUND
             world = World.objects.create(owner=author, name=form.cleaned_data['name'], universe=universe,
                                          description=form.cleaned_data['description'],
-                                         is_public=form.cleaned_data['is_public'], thumbnail=thumbnail,
+                                         is_public=form.cleaned_data['is_public'], thumbnail=form.cleaned_data['thumbnail'],
                                          background=background)
             return redirect(reverse('world', kwargs={'world_id': world.id}))
         else:
@@ -136,12 +141,15 @@ def create_place(request, world_id):
     elif request.method == 'POST':
         form = PlaceForm(request.POST, request.FILES)
         if form.is_valid():
+            if form.cleaned_data['background']:
+                background = form.cleaned_data['background']
+            else:
+                background = DEFAULT_BACKGROUND
             author = Player.objects.get(user__username=request.user.username)
-            thumbnail = Photo(file_name=form.cleaned_data['thumbnail'])
-            thumbnail.save()
             place = Place.objects.create(owner=author, name=form.cleaned_data['name'], world=world,
                                          description=form.cleaned_data['description'],
-                                         is_public=form.cleaned_data['is_public'], thumbnail=thumbnail)
+                                         is_public=form.cleaned_data['is_public'], thumbnail=form.cleaned_data['thumbnail'],
+                                         background=background)
             return redirect(reverse('place', kwargs={'place_id': place.id}))
         else:
             context_dict['form'] = form

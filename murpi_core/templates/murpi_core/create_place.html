@@ -42,6 +42,12 @@
         </div>
 
         <div>
+            <div>{{ form.background.errors }}</div>
+            <label for="{{ form.background.id_for_label }}">Background: </label>
+            {{ form.background }}
+        </div>
+
+        <div>
             <div>{{ form.description.errors }}</div>
             <div><label for="{{ form.description.id_for_label }}">Description: </label></div>
             {{ form.description }}

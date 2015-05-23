@@ -121,6 +121,10 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR,  'templates'),
 )
 
+DEFAULT_AVATAR = 'img/avatar/default.png'
+DEFAULT_THUMBNAIL = 'img/thumbnail/default.png'
+DEFAULT_BACKGROUND = 'img/background/default.png'
+
 # Authorization / Permissions
 
 LOGIN_URL = '/login/'

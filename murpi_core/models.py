@@ -23,7 +23,7 @@ def generate_hash():
     return full_hash.hexdigest()
 
 
-def generate_photo_path(instance, filename):
+def generate_avatar_path(instance, filename):
     """
     Generate new photo filename and path.
     Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
@@ -31,25 +31,32 @@ def generate_photo_path(instance, filename):
     return 'img/avatar/{0}.{1}'.format(generate_hash(), filename.split('.')[-1])
 
 
+def generate_thumbnail_path(instance, filename):
+    """
+    Generate new photo filename and path.
+    Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
+    """
+    return 'img/thumbnail/{0}.{1}'.format(generate_hash(), filename.split('.')[-1])
+
+
+def generate_background_path(instance, filename):
+    """
+    Generate new photo filename and path.
+    Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
+    """
+    return 'img/background/{0}.{1}'.format(generate_hash(), filename.split('.')[-1])
+
+
 # === Models for MURPI_core ===
 
 # Not adding the verbose documentation to each model until there is a working core.
 
 
-class Photo(models.Model):
-    file_name = models.ImageField(upload_to=generate_photo_path, width_field='width', height_field='height')
-    width = models.FloatField(null=True)
-    height = models.FloatField(null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.file_name.url
-
-
 class Player(models.Model):
     user = models.OneToOneField(User)
-    avatar = models.ForeignKey(Photo)
+    avatar = models.ImageField(upload_to=generate_avatar_path, width_field='avatar_width', height_field='avatar_height')
+    avatar_width = models.FloatField(null=True)
+    avatar_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -88,8 +95,12 @@ class Universe(models.Model):
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player)
     is_public = models.BooleanField(default=True)
-    thumbnail = models.ForeignKey(Photo, related_name='universe_thumbnail')
-    background = models.ForeignKey(Photo, related_name='universe_background', null=True)
+    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
+    thumbnail_width = models.FloatField(null=True)
+    thumbnail_height = models.FloatField(null=True)
+    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height')
+    background_width = models.FloatField(null=True)
+    background_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -105,8 +116,12 @@ class World(models.Model):
     owner = models.ForeignKey(Player)
     is_public = models.BooleanField(default=True)
     universe = models.ForeignKey(Universe)
-    thumbnail = models.ForeignKey(Photo, related_name='world_thumbnail')
-    background = models.ForeignKey(Photo, related_name='world_background', null=True)
+    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
+    thumbnail_width = models.FloatField(null=True)
+    thumbnail_height = models.FloatField(null=True)
+    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height')
+    background_width = models.FloatField(null=True)
+    background_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -122,8 +137,12 @@ class Place(models.Model):
     owner = models.ForeignKey(Player)
     world = models.ForeignKey(World)
     is_public = models.BooleanField(default=True)
-    thumbnail = models.ForeignKey(Photo, related_name='place_thumbnail')
-    background = models.ForeignKey(Photo, related_name='place_background', null=True)
+    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
+    thumbnail_width = models.FloatField(null=True)
+    thumbnail_height = models.FloatField(null=True)
+    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height')
+    background_width = models.FloatField(null=True)
+    background_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -150,7 +169,9 @@ class Race(models.Model):
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player)
-    thumbnail = models.ForeignKey(Photo)
+    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
+    thumbnail_width = models.FloatField(null=True)
+    thumbnail_height = models.FloatField(null=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
 
@@ -172,7 +193,9 @@ class Character(models.Model):
     nick = models.CharField(max_length=100, null=True)
     race = models.ForeignKey(Race, blank=False)
     status = models.ForeignKey(CharacterStatus)
-    avatar = models.ForeignKey(Photo)
+    avatar = models.ImageField(upload_to=generate_avatar_path, width_field='avatar_width', height_field='avatar_height')
+    avatar_width = models.FloatField(null=True)
+    avatar_height = models.FloatField(null=True)
     home_world = models.ForeignKey(World, blank=False)
     description = models.TextField(null=True)
     author = models.ForeignKey(Player, related_name='character_author')

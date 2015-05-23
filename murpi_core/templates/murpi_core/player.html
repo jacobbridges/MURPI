@@ -9,7 +9,7 @@
     <h2>{{ player.user.username }}</h2>
     <a href="{% url 'logout' %}">Logout</a>
 
-    <img src="{{ player.avatar.file_name.url }}" style="width:100px; height:auto;">
+    <img src="{{ player.avatar.url }}" style="width:100px; height:auto;">
 
     <div>Number of posts {{ player.post_set.count }}</div>
 

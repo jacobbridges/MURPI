@@ -6,6 +6,7 @@ class PlaceForm(forms.Form):
     description = forms.CharField(widget=forms.Textarea)
     is_public = forms.BooleanField(widget=forms.CheckboxInput, required=False, initial=True)
     thumbnail = forms.ImageField()
+    background = forms.ImageField(required=False)
 
 
 class WorldForm(forms.Form):
