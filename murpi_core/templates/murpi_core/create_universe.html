@@ -8,6 +8,14 @@
 
     <h2>Create a New Universe</h2>
 
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
     {% if request.user.is_anonymous %}
     <h4>You must be logged in to create a universe!</h4>
     {% endif %}
@@ -53,7 +61,9 @@
             {{ form.description }}
         </div>
 
-        <input type="submit" value="Create" />
+        <div>
+            <input type="submit" value="Create" />
+        </div>
 
         </fieldset>
     </form>

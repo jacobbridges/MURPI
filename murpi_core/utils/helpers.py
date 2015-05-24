@@ -1,5 +1,6 @@
 from django.http.request import QueryDict
 from MURPI.settings import MEDIA_ROOT
+from os import remove
 
 
 def dict_has_keys(d, keys, check_not_empty=False):
@@ -23,3 +24,12 @@ def handle_uploaded_files(f, path_to_file):
     with open(MEDIA_ROOT + '/' + path_to_file, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+
+def delete_uploaded_files(model, field, file_path):
+    args = {field: file_path}
+    if not model.objects.filter(**args):
+        try:
+            remove(MEDIA_ROOT + '/' + file_path)
+        except IOError:
+            print u"Was not able to delete file: {}".format(file_path)

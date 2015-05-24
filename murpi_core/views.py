@@ -9,7 +9,7 @@ from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND
-from .utils.helpers import dict_has_keys
+from .utils.helpers import dict_has_keys, delete_uploaded_files
 from .models import Player, Universe, World, Place
 from .forms import PlaceForm, WorldForm, UniverseForm
 
@@ -110,7 +110,6 @@ def create_universe(request):
             universe.save()
             return redirect(reverse('universe', kwargs={'universe_id': universe.id}))
         else:
-            print dir(form)
             return render(request, "murpi_core/create_universe.html", {'form': form})
     else:
         raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
@@ -132,15 +131,16 @@ def create_world(request, universe_id):
     elif request.method == 'POST':
         form = WorldForm(request.POST, request.FILES)
         if form.is_valid():
-            author = Player.objects.get(user__username=request.user.username)
-            if form.cleaned_data['background']:
-                background = form.cleaned_data['background']
-            else:
-                background = DEFAULT_BACKGROUND
-            world = World.objects.create(owner=author, name=form.cleaned_data['name'], universe=universe,
-                                         description=form.cleaned_data['description'],
-                                         is_public=form.cleaned_data['is_public'], thumbnail=form.cleaned_data['thumbnail'],
-                                         background=background)
+            world = form.save(commit=False)
+            world.owner = Player.objects.get(user__username=request.user.username)
+            world.universe = universe
+            try:
+                world.save()
+            except IntegrityError as e:
+                delete_uploaded_files(World, 'thumbnail', world.thumbnail.name)
+                form.add_error('name', 'This world already exists in the current universe.')
+                context_dict['form'] = form
+                return render(request, "murpi_core/create_world.html", context_dict)
             return redirect(reverse('world', kwargs={'world_id': world.id}))
         else:
             context_dict['form'] = form
