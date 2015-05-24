@@ -9,7 +9,7 @@ from django.db import IntegrityError
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND
-from .utils.helpers import dict_has_keys, delete_uploaded_files
+from .utils.helpers import dict_has_keys, delete_uploaded_file
 from .models import Player, Universe, World, Place
 from .forms import PlaceForm, WorldForm, UniverseForm
 
@@ -137,7 +137,7 @@ def create_world(request, universe_id):
             try:
                 world.save()
             except IntegrityError:
-                delete_uploaded_files(World, 'thumbnail', world.thumbnail.name)
+                delete_uploaded_file(World, 'thumbnail', world.thumbnail.name)
                 form.add_error('name', 'This world already exists in the current universe.')
                 context_dict['form'] = form
                 return render(request, "murpi_core/create_world.html", context_dict)
@@ -171,7 +171,7 @@ def create_place(request, world_id):
             try:
                 place.save()
             except IntegrityError:
-                delete_uploaded_files(Place, 'thumbnail', place.thumbnail.name)
+                delete_uploaded_file(Place, 'thumbnail', place.thumbnail.name)
                 form.add_error('name', 'This place already exists in the current world.')
                 context_dict['form'] = form
                 return render(request, "murpi_core/create_place.html", context_dict)
