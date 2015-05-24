@@ -136,7 +136,7 @@ def create_world(request, universe_id):
             world.universe = universe
             try:
                 world.save()
-            except IntegrityError as e:
+            except IntegrityError:
                 delete_uploaded_files(World, 'thumbnail', world.thumbnail.name)
                 form.add_error('name', 'This world already exists in the current universe.')
                 context_dict['form'] = form
