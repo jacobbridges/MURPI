@@ -165,15 +165,16 @@ def create_place(request, world_id):
     elif request.method == 'POST':
         form = PlaceForm(request.POST, request.FILES)
         if form.is_valid():
-            if form.cleaned_data['background']:
-                background = form.cleaned_data['background']
-            else:
-                background = DEFAULT_BACKGROUND
-            author = Player.objects.get(user__username=request.user.username)
-            place = Place.objects.create(owner=author, name=form.cleaned_data['name'], world=world,
-                                         description=form.cleaned_data['description'],
-                                         is_public=form.cleaned_data['is_public'], thumbnail=form.cleaned_data['thumbnail'],
-                                         background=background)
+            place = form.save(commit=False)
+            place.owner = Player.objects.get(user__username=request.user.username)
+            place.world = world
+            try:
+                place.save()
+            except IntegrityError:
+                delete_uploaded_files(Place, 'thumbnail', place.thumbnail.name)
+                form.add_error('name', 'This place already exists in the current world.')
+                context_dict['form'] = form
+                return render(request, "murpi_core/create_place.html", context_dict)
             return redirect(reverse('place', kwargs={'place_id': place.id}))
         else:
             context_dict['form'] = form
@@ -184,7 +185,7 @@ def create_place(request, world_id):
 
 @require_safe
 def retrieve_place(request, place_id):
-    place = get_object_or_404(Player, pk=place_id)
+    place = get_object_or_404(Place, pk=place_id)
     return render(request, "murpi_core/place.html", {'place': place})
 
 
