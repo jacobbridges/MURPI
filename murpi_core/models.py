@@ -61,6 +61,10 @@ class Player(models.Model):
     def __unicode__(self):
         return self.user.username
 
+    @staticmethod
+    def has_file(file_path):
+        return True if Player.objects.filter(avatar=file_path) else False
+
 
 # A collection of scenes depicting a complete story
 class Roleplay(models.Model):
@@ -105,6 +109,10 @@ class Universe(models.Model):
     def __unicode__(self):
         return self.name
 
+    @staticmethod
+    def has_file(file_path):
+        return True if Universe.objects.filter(thumbnail=file_path) or Universe.objects.filter(background=file_path) else False
+
 
 # World -> Place -> Scene
 class World(models.Model):
@@ -125,6 +133,10 @@ class World(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @staticmethod
+    def has_file(file_path):
+        return True if World.objects.filter(thumbnail=file_path) or World.objects.filter(background=file_path) else False
 
     class Meta:
         unique_together = ('name', 'universe',)
@@ -149,6 +161,10 @@ class Place(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @staticmethod
+    def has_file(file_path):
+        return True if Place.objects.filter(thumbnail=file_path) or Place.objects.filter(background=file_path) else False
 
     class Meta:
         unique_together = ('name', 'world',)
