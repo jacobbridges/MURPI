@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Worlds</title>
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+<h2>{{ world.name }}</h2>
+
+{% with place_count=world.place_set.count %}
+    {% if place_count == 1 %}
+    <h4>1 Place</h4>
+    {% else %}
+    <h4>{{ place_count }} Places</h4>
+    {% endif %}
+{% endwith %}
+
+<div class="list_area">
+
+<table>
+  <thead style="font-weight:bold">
+    <tr>
+      <td>ID</td>
+      <td>Name</td>
+      <td>Description</td>
+      <td>Thumbnail</td>
+      <td># Scenes</td>
+      <td># Posts</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for place in places %}
+    <tr>
+      <td>{{ place.id }}</td>
+      <td>{{ place.name }}</td>
+      <td>{{ place.description|truncatewords:40 }}</td>
+      <td><img src="{{ place.thumbnail.url }}" style="width:50px"></td>
+      <td>{{ place.scene_set.count }}</td>
+      <td>{{ place.num_posts }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+</div>
+
+</body>
+</html>
