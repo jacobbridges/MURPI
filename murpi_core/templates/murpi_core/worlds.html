@@ -4,78 +4,45 @@
     <meta charset="UTF-8">
     <title>Worlds</title>
     <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-    <style>
-        * {
-  font-family: Lato;
-}
-
-.list_area {
-  width: 600px;
-  height: 400px;
-  overflow-y: scroll;
-}
-
-.row {
-  background-color: #f00;
-  border-bottom: 2px solid black;
-  height: 75px;
-  padding: 5px;
-  position: relative;
-}
-
-.thumb {
-  height: 75px;
-  width: 75px;
-  vertical-align: middle;
-}
-
-.name {
-  font-size: 16pt;
-  position: absolute;
-  top: 8px;
-}
-
-.desc {
-  width: 400px;
-  font-size: 11pt;
-  position: relative;
-  top: 2px;
-  left: 1px;
-}
-
-.author {
-  float: right;
-}
-
-.num_chars {
-  float: right;
-  margin-left: 8px;
-}
-
-.num_places {
-  float: right;
-  margin-left: 8px;
-}
-    </style>
 </head>
 <body>
 
 <h2>{{ universe.name }}</h2>
 
-<h4>{{ universe.world_set.count }} Worlds</h4>
+{% with world_count=universe.world_set.count %}
+    {% if world_count == 1 %}
+    <h4>1 World</h4>
+    {% else %}
+    <h4>{{ world_count }} Worlds</h4>
+    {% endif %}
+{% endwith %}
 
 <div class="list_area">
 
-    {% for world in worlds %}
-    <div class="row">
-        <img class="thumb"  src="{{ world.thumbnail.url }}">
-        <span class="name">{{ world.name }}</span>
-        <span class="desc">{{ world.description|truncatewords:40 }}</span>
-        <span class="num_places">{{ world.place_set.count }}</span>
-        <span class="num_chars">{{ world.character_set.count }}</span>
-        <span class="author">{{ world.owner.user.username }}</span>
-    </div>
-    {% endfor %}
+<table>
+  <thead style="font-weight:bold">
+    <tr>
+      <td>ID</td>
+      <td>Name</td>
+      <td>Description</td>
+      <td>Thumbnail</td>
+      <td># Places</td>
+      <td># Posts</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for world in worlds %}
+    <tr>
+      <td>{{ world.id }}</td>
+      <td>{{ world.name }}</td>
+      <td>{{ world.description|truncatewords:40 }}</td>
+      <td><img src="{{ world.thumbnail.url }}" style="width:50px"></td>
+      <td>{{ world.place_set.count }}</td>
+      <td>{{ world.num_posts }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
 
 </div>
 
