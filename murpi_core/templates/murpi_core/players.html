@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Players</title>
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+{% with player_count=players|length %}
+    {% if player_count == 1 %}
+    <h4>1 Player</h4>
+    {% else %}
+    <h4>{{ player_count }} Players</h4>
+    {% endif %}
+{% endwith %}
+
+<div class="list_area">
+
+<table>
+  <thead style="font-weight:bold">
+    <tr>
+      <td colspan="4">
+          <form action="{% url 'players' %}" method="get">
+            <input type="text" id="search" name="q" placeholder="Search">
+            <input type="submit" value="Search">
+          </form>
+      </td>
+    </tr>
+    <tr>
+      <td>ID</td>
+      <td>Name</td>
+      <td>Thumbnail</td>
+      <td># Posts</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for player in players %}
+    <tr>
+      <td>{{ player.id }}</td>
+      <td>{{ player.user.username }}</td>
+      <td><img src="{{ player.avatar.url }}" style="width:50px"></td>
+      <td>{{ player.num_posts }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+</div>
+
+</body>
+</html>

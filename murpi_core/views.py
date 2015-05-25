@@ -246,3 +246,17 @@ def retrieve_places(request, world_id):
         # If page is out of range (e.g. 9999), deliver last page of results.
         places_sub = paginator.page(paginator.num_pages)
     return render(request, "murpi_core/places.html", {'world': world, 'places': places_sub})
+
+
+@require_safe
+def retrieve_players(request):
+    if request.GET.get('q'):
+        players = Player.objects\
+            .filter(user__username__contains=request.GET.get('q'))\
+            .annotate(num_posts=Count('rp_post_author'))\
+            .order_by('id')
+    else:
+        players = Player.objects.all()\
+            .annotate(num_posts=Count('rp_post_author'))\
+            .order_by('id')
+    return render(request, "murpi_core/players.html", {'players': players})
