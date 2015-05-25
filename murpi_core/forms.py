@@ -1,6 +1,6 @@
 from django.forms import Form, ModelForm
 
-from .models import Universe, World, Place
+from .models import Universe, World, Place, Roleplay
 
 
 class PlaceForm(ModelForm):
@@ -19,3 +19,9 @@ class UniverseForm(ModelForm):
     class Meta:
         model = Universe
         fields = ['name', 'description', 'is_public', 'thumbnail', 'background']
+
+
+class RoleplayForm(ModelForm):
+    class Meta:
+        model = Roleplay
+        fields = ['name', 'short_description', 'description', 'plain_rules', 'is_public', 'status']

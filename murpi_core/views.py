@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND
 from .utils.helpers import dict_has_keys, delete_uploaded_file
 from .models import Player, Universe, World, Place
-from .forms import PlaceForm, WorldForm, UniverseForm
+from .forms import PlaceForm, WorldForm, UniverseForm, RoleplayForm
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -260,3 +260,20 @@ def retrieve_players(request):
             .annotate(num_posts=Count('rp_post_author'))\
             .order_by('id')
     return render(request, "murpi_core/players.html", {'players': players})
+
+
+@require_http_methods(['GET', 'POST', 'HEAD'])
+def create_rp(request):
+    if request.method in ['GET', 'HEAD']:
+        return render(request, "murpi_core/create_rp.html", {'form': RoleplayForm()})
+    elif request.method == 'POST':
+        form = RoleplayForm(request.POST, request.FILES)
+        if form.is_valid():
+            rp = form.save(commit=False)
+            rp.game_master = Player.objects.get(user__username=request.user.username)
+            rp.save()
+            return redirect(reverse('rp', kwargs={'rp_id': rp.id}))
+        else:
+            return render(request, "murpi_core/create_rp.html", {'form': form})
+    else:
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')

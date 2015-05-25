@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>New Roleplay</title>
+</head>
+<body>
+
+    <h2>Create a New RP</h2>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if request.user.is_anonymous %}
+    <h4>You must be logged in to create a roleplay!</h4>
+    {% endif %}
+
+    <form method="post" action="{% url 'create_rp' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        {% if request.user.is_anonymous %}
+        <fieldset disabled="disabled">
+        {% else %}
+        <fieldset>
+        {% endif %}
+
+        <div>
+            <div>{{ form.name.errors }}</div>
+            <label for="{{ form.name.id_for_label }}">Name: </label>
+            {{ form.name }}
+        </div>
+
+        <div>
+            <div>{{ form.is_public.errors }}</div>
+            <label for="{{ form.is_public.id_for_label }}">Public? </label>
+            {{ form.is_public }}
+        </div>
+
+        <div>
+            <div>{{ form.short_description.errors }}</div>
+            <label for="{{ form.short_description.id_for_label }}">Short Description: </label>
+            {{ form.short_description }}
+        </div>
+
+        <div>
+            <div>{{ form.plain_rules.errors }}</div>
+            <div><label for="{{ form.plain_rules.id_for_label }}">Rules: </label></div>
+            {{ form.plain_rules }}
+        </div>
+
+        <div>
+            <div>{{ form.description.errors }}</div>
+            <div><label for="{{ form.description.id_for_label }}">Description: </label></div>
+            {{ form.description }}
+        </div>
+
+        <div>
+            <input type="submit" value="Create" />
+        </div>
+
+        </fieldset>
+    </form>
+
+</body>
+</html>
