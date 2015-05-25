@@ -23,19 +23,18 @@ from murpi_core import views as core_views
 
 urlpatterns = [
     url(r'^admin/$', include(admin.site.urls)),
-    url(r'^player/@(?P<username>[A-Za-z0-9_]+)/$', core_views.retrieve_player, name="player"),
-    url(r'^player/@(?P<username>[A-Za-z0-9_]+)/characters/$', core_views.retrieve_player_characters,
-        name="player_characters"),
-    url(r'^universe/(?P<universe_id>[0-9]+)/$', core_views.retrieve_universe, name="universe"),
-    url(r'^universes/$', core_views.retrieve_universes, name="universes"),
-    url(r'^universes/create/$', core_views.create_universe, name="create_universe"),
-    url(r'^universe/(?P<universe_id>[0-9]+)/worlds/$', core_views.retrieve_worlds, name="worlds"),
-    url(r'^universe/(?P<universe_id>[0-9]+)/worlds/create/$', core_views.create_world, name="create_world"),
-    url(r'^world/(?P<world_id>[0-9]+)/$', core_views.retrieve_world, name="world"),
-    url(r'^world/(?P<world_id>[0-9]+)/places/', core_views.retrieve_places, name="places"),
-    url(r'^world/(?P<world_id>[0-9]+)/places/create/$', core_views.create_place, name="create_place"),
-    url(r'^place/(?P<place_id>[0-9]+)/$', core_views.retrieve_place, name="place"),
-    url(r'^register/$', core_views.register, name="register"),
-    url(r'^login/$', core_views.login, name="login"),
-    url(r'^logout/$', core_views.logout, name="logout")
+    url(r'^player/@(?P<username>[A-Za-z0-9_]+)/$',              core_views.retrieve_player,             name="player"),
+    url(r'^player/@(?P<username>[A-Za-z0-9_]+)/characters/$',   core_views.retrieve_player_characters,  name="player_characters"),
+    url(r'^universe/(?P<universe_id>[0-9]+)/$',                 core_views.retrieve_universe,           name="universe"),
+    url(r'^universes/$',                                        core_views.retrieve_universes,          name="universes"),
+    url(r'^universes/create/$',                                 core_views.create_universe,             name="create_universe"),
+    url(r'^universe/(?P<universe_id>[0-9]+)/worlds/$',          core_views.retrieve_worlds,             name="worlds"),
+    url(r'^universe/(?P<universe_id>[0-9]+)/worlds/create/$',   core_views.create_world,                name="create_world"),
+    url(r'^world/(?P<world_id>[0-9]+)/$',                       core_views.retrieve_world,              name="world"),
+    url(r'^world/(?P<world_id>[0-9]+)/places/',                 core_views.retrieve_places,             name="places"),
+    url(r'^world/(?P<world_id>[0-9]+)/places/create/$',         core_views.create_place,                name="create_place"),
+    url(r'^place/(?P<place_id>[0-9]+)/$',                       core_views.retrieve_place,              name="place"),
+    url(r'^register/$',                                         core_views.register,                    name="register"),
+    url(r'^login/$',                                            core_views.login,                       name="login"),
+    url(r'^logout/$',                                           core_views.logout,                      name="logout")
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
