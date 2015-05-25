@@ -207,3 +207,21 @@ def retrieve_worlds(request, universe_id):
         # If page is out of range (e.g. 9999), deliver last page of results.
         worlds_sub = paginator.page(paginator.num_pages)
     return render(request, "murpi_core/worlds.html", {'universe': universe, 'worlds': worlds_sub})
+
+
+@require_safe
+def retrieve_universes(request):
+    universes = Universe.objects.all()\
+        .order_by('date_modified')\
+        .annotate(num_rps=Count('world__place__scene__roleplay', distinct=True))
+    paginator = Paginator(universes, 10)
+    page = request.GET.get('page')
+    try:
+        u_sub = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        u_sub = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        u_sub = paginator.page(paginator.num_pages)
+    return render(request, "murpi_core/universes.html", {'universes': u_sub})
