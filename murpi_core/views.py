@@ -193,9 +193,10 @@ def retrieve_place(request, place_id):
 @require_safe
 def retrieve_worlds(request, universe_id):
     universe = get_object_or_404(Universe, pk=universe_id)
-    worlds = World.objects.all().filter(universe_id=universe_id).order_by('date_modified').annotate(num_posts=Count('place__scene__roleplaypost'))
-    for world in worlds:
-        print world.num_posts
+    worlds = World.objects.all()\
+        .filter(universe_id=universe_id)\
+        .order_by('date_modified')\
+        .annotate(num_posts=Count('place__scene__roleplaypost'))
     paginator = Paginator(worlds, 10)
     page = request.GET.get('page')
     try:
