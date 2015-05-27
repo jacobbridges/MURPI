@@ -38,7 +38,8 @@ urlpatterns = [
     url(r'^register/$',                                         core_views.register,                    name="register"),
     url(r'^login/$',                                            core_views.login,                       name="login"),
     url(r'^logout/$',                                           core_views.logout,                      name="logout"),
-    url(r'^rps/create/$',                                        core_views.create_rp,                   name="create_rp")
+    url(r'^rps/create/$',                                       core_views.create_rp,                   name="create_rp"),
+    url(r'^rp/(?P<rp_id>[0-9]+)/$',                             core_views.retrieve_rp,                 name="rp")
     # url(r'^rp/(?P<rp_id>[0-9]+0-9)/scenes/$', ),
     # url(r'^rp/(?P<rp_id>[0-9]+)/posts/$', )
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
