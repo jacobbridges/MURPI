@@ -44,6 +44,12 @@
         </div>
 
         <div>
+            <div>{{ form.status.errors }}</div>
+            <label for="{{ form.status.id_for_label }}">Status: </label>
+            {{ form.status }}
+        </div>
+
+        <div>
             <div>{{ form.short_description.errors }}</div>
             <label for="{{ form.short_description.id_for_label }}">Short Description: </label>
             {{ form.short_description }}
