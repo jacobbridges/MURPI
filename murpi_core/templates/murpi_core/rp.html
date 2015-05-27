@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{ rp.name }}</title>
+</head>
+<body>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h2>{{ rp.name }}</h2>
+
+    <p>
+      Date Created: {{ rp.date_created|date:"D d M Y" }}
+    </p>
+
+    <p>
+      {% if most_recent_post_time %}
+      Last Post: {{ most_recent_post_time|date:"h\:i D d M Y" }}
+      {% else %}
+      Last Post: Never
+      {% endif %}
+    </p>
+
+    <p>
+      Description:
+      <p>
+        <textarea disabled>
+        {{ rp.description }}
+        </textarea>
+      </p>
+    </p>
+
+    <p>
+      GM: {{ rp.game_master }}
+    </p>
+
+    <p>
+      Rules:
+      <p>
+        <textarea disabled>
+        {{ rp.plain_rules }}
+        </textarea>
+      </p>
+    </p>
+
+    <p>
+      {% if rp.is_publc %}
+      <i>Public</i>
+      {% else %}
+      <i>Private</i>
+      {% endif %}
+    </p>
+
+    <p>
+       Status: {{ rp.status }}
+    </p>
+
+</body>
+</html>
