@@ -295,7 +295,8 @@ def retrieve_rp(request, rp_id):
 def create_scene_rp_view(request, rp_id):
     rp = get_object_or_404(Roleplay, pk=rp_id)
     if request.method in ['GET', 'HEAD']:
-        return render(request, "murpi_core/create_scene_from_rp.html", {'form': SceneFormForRPView()})
+        return render(request, "murpi_core/create_scene_from_rp.html", {'form': SceneFormForRPView(),
+                                                                        'rp': rp})
     elif request.method == 'POST':
         form = SceneFormForRPView(request.POST)
         if form.is_valid():
@@ -306,7 +307,8 @@ def create_scene_rp_view(request, rp_id):
             return redirect(reverse('scene', kwargs={'scene_id': scene.id}))
         else:
             print form.errors
-            return render(request, "murpi_core/create_scene_from_rp.html", {'form': form})
+            return render(request, "murpi_core/create_scene_from_rp.html", {'form': form,
+                                                                            'rp': rp})
     else:
         raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
 
