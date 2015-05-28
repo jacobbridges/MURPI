@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND
 from .utils.helpers import dict_has_keys, delete_uploaded_file
 from .models import Player, Universe, World, Place, Roleplay, Scene, RoleplayPost
-from .forms import PlaceForm, WorldForm, UniverseForm, RoleplayForm
+from .forms import PlaceForm, WorldForm, UniverseForm, RoleplayForm, SceneFormForRPView
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -267,7 +267,7 @@ def create_rp(request):
     if request.method in ['GET', 'HEAD']:
         return render(request, "murpi_core/create_rp.html", {'form': RoleplayForm()})
     elif request.method == 'POST':
-        form = RoleplayForm(request.POST, request.FILES)
+        form = RoleplayForm(request.POST)
         if form.is_valid():
             rp = form.save(commit=False)
             rp.game_master = Player.objects.get(user__username=request.user.username)
@@ -289,3 +289,29 @@ def retrieve_rp(request, rp_id):
     except ObjectDoesNotExist:
         most_recent_post_time = None
     return render(request, "murpi_core/rp.html", {'rp': rp, 'most_recent_post_time': most_recent_post_time})
+
+
+@require_http_methods(['GET', 'POST', 'HEAD'])
+def create_scene_rp_view(request, rp_id):
+    rp = get_object_or_404(Roleplay, pk=rp_id)
+    if request.method in ['GET', 'HEAD']:
+        return render(request, "murpi_core/create_scene_from_rp.html", {'form': SceneFormForRPView()})
+    elif request.method == 'POST':
+        form = SceneFormForRPView(request.POST)
+        if form.is_valid():
+            scene = form.save(commit=False)
+            scene.owner = Player.objects.get(user__username=request.user.username)
+            scene.roleplay = rp
+            scene.save()
+            return redirect(reverse('scene', kwargs={'scene_id': scene.id}))
+        else:
+            print form.errors
+            return render(request, "murpi_core/create_scene_from_rp.html", {'form': form})
+    else:
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
+
+
+@require_safe
+def retrieve_scene(request, scene_id):
+    scene = get_object_or_404(Scene, pk=scene_id)
+    return render(request, "murpi_core/scene.html", {'scene': scene})
