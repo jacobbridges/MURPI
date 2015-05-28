@@ -182,6 +182,9 @@ class Scene(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        unique_together = (('name', 'roleplay', 'place'),)
+
 
 class Race(models.Model):
     name = models.CharField(max_length=50)
