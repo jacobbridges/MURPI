@@ -44,5 +44,6 @@ urlpatterns = [
     url(r'^rp/(?P<rp_id>[0-9]+)/$',                             core_views.retrieve_rp,                 name="rp"),
     url(r'^rp/(?P<rp_id>[0-9]+)/scenes/$',                      core_views.retrieve_scenes_rp_view,     name="scenes_rp_view"),
     url(r'^rp/(?P<rp_id>[0-9]+)/scenes/create/$',               core_views.create_scene_rp_view,        name="create_scene_rp_view"),
-    url(r'^scene/(?P<scene_id>[0-9]+)/$',                       core_views.retrieve_scene,              name="scene")
+    url(r'^scene/(?P<scene_id>[0-9]+)/$',                       core_views.retrieve_scene,              name="scene"),
+    url(r'^scene/(?P<scene_id>[0-9]+)/posts/$',                 core_views.retrieve_posts_scene_view,   name="posts_scene_view"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

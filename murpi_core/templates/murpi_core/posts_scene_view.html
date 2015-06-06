@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{{ scene.name }} Posts</title>
+</head>
+<body>
+
+<h2><a href="{% url 'scene' scene_id=scene.id %}">{{ scene.name }}</a> Posts</h2>
+
+{% with post_count=scene.post_set.count %}
+    {% if post_count == 1 %}
+    <h4>1 Post</h4>
+    {% else %}
+    <h4>{{ post_count }} Posts</h4>
+    {% endif %}
+{% endwith %}
+
+<div class="list_area">
+
+  {% for post in posts %}
+  <div>
+    <span>Roleplay: <a href="{% url 'rp' rp_id=post.scene.roleplay.id %}"><i>{{ post.scene.roleplay.name }}</i></a></span>&nbsp;&nbsp;
+    <span>Character: <i>{{ post.character.name }}</i></span>&nbsp;&nbsp;
+    <span>Author: <a href="{% url 'player' username=post.author.user.username %}"><i>{{ post.author.user.username }}</i></a></span>&nbsp;&nbsp;
+    <p>
+      {{ post.text }}
+    </p>
+  </div>
+  {% endfor %}
+
+</div>
+
+</body>
+</html>
