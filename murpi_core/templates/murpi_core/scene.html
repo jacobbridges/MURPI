@@ -15,7 +15,7 @@
     {% endif %}
 
     <h2>{{ scene.name }}</h2>
-    <i>for {{ scene.roleplay.name }}</i>
+    <i>Scene for {{ scene.roleplay.name }}</i>
 
     {% for post in scene.roleplaypost_set.all %}
     <p>{{ post.text }}</p>

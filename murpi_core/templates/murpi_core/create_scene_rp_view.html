@@ -20,7 +20,7 @@
     <h4>You must be logged in to create a scene!</h4>
     {% endif %}
 
-    <form method="post" action="{% url 'create_scene_from_rp' rp_id=rp.id %}" enctype="multipart/form-data">
+    <form method="post" action="{% url 'create_scene_rp_view' rp_id=rp.id %}" enctype="multipart/form-data">
         {% csrf_token %}
 
         {{ form.non_field_errors }}
