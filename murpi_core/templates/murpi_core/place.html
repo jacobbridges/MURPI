@@ -15,7 +15,8 @@
     {% endif %}
 
     <h2>{{ place.name }}</h2>
-    <i>{{ place.world.name }}</i>
+    <i>World: <a href="{% url 'world' world_id=place.world.id %}">{{ place.world.name }}</a></i><br>
+    <i><a href="{% url 'scenes_place_view' place_id=place.id %}">Scenes</a></i>
 
 </body>
 </html>

@@ -357,3 +357,23 @@ def retrieve_scenes_world_view(request, world_id):
         # If page is out of range (e.g. 9999), deliver last page of results.
         scenes_sub = paginator.page(paginator.num_pages)
     return render(request, "murpi_core/scenes_world_view.html", {'world': world, 'scenes': scenes_sub})
+
+
+@require_safe
+def retrieve_scenes_place_view(request, place_id):
+    place = get_object_or_404(Place, pk=place_id)
+    scenes = Scene.objects.all()\
+        .filter(place__id=place_id)\
+        .order_by('date_modified')\
+        .annotate(num_posts=Count('roleplaypost'))
+    paginator = Paginator(scenes, 10)
+    page = request.GET.get('page')
+    try:
+        scenes_sub = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        scenes_sub = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        scenes_sub = paginator.page(paginator.num_pages)
+    return render(request, "murpi_core/scenes_place_view.html", {'place': place, 'scenes': scenes_sub})

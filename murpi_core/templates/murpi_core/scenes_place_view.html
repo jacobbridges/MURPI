@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Places Scenes</title>
+</head>
+<body>
+
+<h2><a href="{% url 'place' place_id=place.id %}">{{ place.name }}</a> Scenes</h2>
+
+{% with scene_count=rp.scene_set.count %}
+    {% if scene_count == 1 %}
+    <h4>1 Scene</h4>
+    {% else %}
+    <h4>{{ scene_count }} Scenes</h4>
+    {% endif %}
+{% endwith %}
+
+<div class="list_area">
+
+<table>
+  <thead style="font-weight:bold">
+    <tr>
+      <td>ID</td>
+      <td>Name</td>
+      <td>RP Name</td>
+      <td>Short Description</td>
+      <td># Posts</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for scene in scenes %}
+    <tr>
+      <td>{{ scene.id }}</td>
+      <td>{{ scene.name }}</td>
+      <td>{{ scene.roleplay.name }}</td>
+      <td>{{ scene.short_description}}</td>
+      <td>{{ scene.num_posts }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+</div>
+
+</body>
+</html>

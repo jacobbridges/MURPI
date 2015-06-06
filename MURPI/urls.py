@@ -36,6 +36,7 @@ urlpatterns = [
     url(r'^world/(?P<world_id>[0-9]+)/scenes/$',                core_views.retrieve_scenes_world_view,  name="scenes_world_view"),
     url(r'^world/(?P<world_id>[0-9]+)/places/create/$',         core_views.create_place,                name="create_place"),
     url(r'^place/(?P<place_id>[0-9]+)/$',                       core_views.retrieve_place,              name="place"),
+    url(r'^place/(?P<place_id>[0-9]+)/scenes/$',                core_views.retrieve_scenes_place_view,  name="scenes_place_view"),
     url(r'^register/$',                                         core_views.register,                    name="register"),
     url(r'^login/$',                                            core_views.login,                       name="login"),
     url(r'^logout/$',                                           core_views.logout,                      name="logout"),
