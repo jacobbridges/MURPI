@@ -2,11 +2,11 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>RP Scenes</title>
+    <title>World Scenes</title>
 </head>
 <body>
 
-<h2>{{ rp.name }} Scenes</h2>
+<h2>{{ world.name }} Scenes</h2>
 
 {% with scene_count=rp.scene_set.count %}
     {% if scene_count == 1 %}
@@ -23,6 +23,8 @@
     <tr>
       <td>ID</td>
       <td>Name</td>
+      <td>RP Name</td>
+      <td>Place Name</td>
       <td>Short Description</td>
       <td># Posts</td>
     </tr>
@@ -32,6 +34,8 @@
     <tr>
       <td>{{ scene.id }}</td>
       <td>{{ scene.name }}</td>
+      <td>{{ scene.roleplay.name }}</td>
+      <td>{{ scene.place.name }}</td>
       <td>{{ scene.short_description}}</td>
       <td>{{ scene.num_posts }}</td>
     </tr>
