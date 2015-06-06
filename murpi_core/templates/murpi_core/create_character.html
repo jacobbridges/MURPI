@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>New Character</title>
+</head>
+<body>
+
+    <h2>Create a New Character</h2>
+
+    {% if request.user.is_anonymous %}
+    <h4>You must be logged in to create a character!</h4>
+    {% endif %}
+
+    <form method="post" action="{% url 'create_character' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        {% if request.user.is_anonymous %}
+        <fieldset disabled="disabled">
+        {% else %}
+        <fieldset>
+        {% endif %}
+
+        <div>
+            <div>{{ form.name.errors }}</div>
+            <label for="{{ form.name.id_for_label }}">Name: </label>
+            {{ form.name }}
+        </div>
+
+        <div>
+            <div>{{ form.nick.errors }}</div>
+            <label for="{{ form.nick.id_for_label }}">Nickname: </label>
+            {{ form.nick }}
+        </div>
+
+        <div>
+            <div>{{ form.race.errors }}</div>
+            <label for="{{ form.race.id_for_label }}">Race: </label>
+            {{ form.race }}
+        </div>
+
+        <div>
+            <div>{{ form.avatar.errors }}</div>
+            <label for="{{ form.avatar.id_for_label }}">Avatar: </label>
+            {{ form.avatar }}
+        </div>
+
+        <div>
+            <div>{{ form.home_world.errors }}</div>
+            <label for="{{ form.home_world.id_for_label }}">Home World: </label>
+            {{ form.home_world }}
+        </div>
+
+        <div>
+            <div>{{ form.description.errors }}</div>
+            <div><label for="{{ form.description.id_for_label }}">Description: </label></div>
+            {{ form.description }}
+        </div>
+
+        <input type="submit" value="Create" />
+
+        </fieldset>
+    </form>
+
+</body>
+</html>

@@ -23,6 +23,9 @@ from murpi_core import views as core_views
 
 urlpatterns = [
     url(r'^admin/$', include(admin.site.urls)),
+    url(r'^character/(?P<character_id>[0-9]+)/$',               core_views.retrieve_character,          name='character'),
+    url(r'^characters/$',                                       core_views.retrieve_characters,         name='characters'),
+    url(r'^characters/create/$',                                core_views.create_character,            name='create_character'),
     url(r'^players/$',                                          core_views.retrieve_players,            name="players"),
     url(r'^player/@(?P<username>[A-Za-z0-9_]+)/$',              core_views.retrieve_player,             name="player"),
     url(r'^player/@(?P<username>[A-Za-z0-9_]+)/characters/$',   core_views.retrieve_player_characters,  name="player_characters"),

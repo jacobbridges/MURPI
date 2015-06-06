@@ -1,6 +1,6 @@
 from django.forms import Form, ModelForm
 
-from .models import Universe, World, Place, Roleplay, Scene
+from .models import Universe, World, Place, Roleplay, Scene, Character
 
 
 class PlaceForm(ModelForm):
@@ -37,3 +37,9 @@ class SceneFormForRPView(ModelForm):
     class Meta:
         model = Scene
         fields = ['name', 'short_description', 'place']
+
+
+class CharacterForm(ModelForm):
+    class Meta:
+        model = Character
+        fields = ['name', 'nick', 'race', 'avatar', 'home_world', 'description']

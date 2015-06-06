@@ -11,8 +11,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from MURPI.settings import DEFAULT_AVATAR, DEFAULT_BACKGROUND
 from .utils.helpers import dict_has_keys, delete_uploaded_file
-from .models import Player, Universe, World, Place, Roleplay, Scene, RoleplayPost
-from .forms import PlaceForm, WorldForm, UniverseForm, RoleplayForm, SceneFormForRPView
+from .models import Player, Universe, World, Place, Roleplay, Scene, RoleplayPost, Character, CharacterStatus
+from .forms import PlaceForm, WorldForm, UniverseForm, RoleplayForm, SceneFormForRPView, CharacterForm
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -96,7 +96,7 @@ def retrieve_player(request, username):
 @require_safe
 def retrieve_player_characters(request, username):
     player = get_object_or_404(Player, user__username=username)
-    return render(request, "murpi_core/characters.html", {'player': player})
+    return render(request, "murpi_core/characters_player_view.html", {'player': player})
 
 
 @require_http_methods(['GET', 'POST', 'HEAD'])
@@ -396,3 +396,33 @@ def retrieve_posts_scene_view(request, scene_id):
         # If page is out of range (e.g. 9999), deliver last page of results.
         posts_sub = paginator.page(paginator.num_pages)
     return render(request, "murpi_core/posts_scene_view.html", {'scene': scene, 'posts': posts_sub})
+
+
+@require_http_methods(['GET', 'POST', 'HEAD'])
+def create_character(request):
+    if request.method in ['GET', 'HEAD']:
+        return render(request, "murpi_core/create_character.html", {'form': CharacterForm()})
+    elif request.method == 'POST':
+        form = CharacterForm(request.POST, request.FILES)
+        if form.is_valid():
+            character = form.save(commit=False)
+            character.owner = Player.objects.get(user__username=request.user.username)
+            character.status = CharacterStatus.objects.get(pk=1)
+            character.save()
+            return redirect(reverse('character', kwargs={'character_id': character.id}))
+        else:
+            return render(request, "murpi_core/create_character.html", {'form': form})
+    else:
+        raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
+
+
+@require_safe
+def retrieve_character(request, scene_id):
+    character = get_object_or_404(Character, pk=scene_id)
+    return render(request, "murpi_core/character.html", {'character': character})
+
+
+@require_safe
+def retrieve_characters(request):
+    characters = Character.objects.all()
+    return render(request, "murpi_core/characters.html", {'characters': characters})
