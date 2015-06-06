@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Characters</title>
+    <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+</head>
+<body>
+
+<h2>All Characters</h2>
+
+{% with character_count=characters|length %}
+    {% if character_count == 1 %}
+    <h4>1 Character</h4>
+    {% else %}
+    <h4>{{ character_count }} Characters</h4>
+    {% endif %}
+{% endwith %}
+
+<div class="list_area">
+
+<table>
+  <thead style="font-weight:bold">
+    <tr>
+      <td>ID</td>
+      <td>Name</td>
+      <td>Status</td>
+      <td>Avatar</td>
+      <td>Home World</td>
+      <td>Seen in # Posts</td>
+    </tr>
+  </thead>
+  <tbody>
+  {% for character in characters %}
+    <tr>
+      <td>{{ character.id }}</td>
+      <td>{{ character.name }}</td>
+      <td>{{ character.status.name }}</td>
+      <td><img src="{{ character.avatar.url }}" style="width:50px"></td>
+      <td>{{ character.home_world.name }}</td>
+      <td>{{ character.roleplaypost_set.count }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+</div>
+
+</body>
+</html>
