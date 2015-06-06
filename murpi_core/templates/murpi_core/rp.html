@@ -15,6 +15,7 @@
     {% endif %}
 
     <h2>{{ rp.name }}</h2>
+    <a href="{% url 'scenes_rp_view' rp_id=rp.id %}">Scenes</a>
 
     <p>
       Date Created: {{ rp.date_created|date:"D d M Y" }}

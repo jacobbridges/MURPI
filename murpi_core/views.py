@@ -317,3 +317,23 @@ def create_scene_rp_view(request, rp_id):
 def retrieve_scene(request, scene_id):
     scene = get_object_or_404(Scene, pk=scene_id)
     return render(request, "murpi_core/scene.html", {'scene': scene})
+
+
+@require_safe
+def retrieve_scenes_rp_view(request, rp_id):
+    rp = get_object_or_404(Roleplay, pk=rp_id)
+    scenes = Scene.objects.all()\
+        .filter(roleplay_id=rp_id)\
+        .order_by('date_modified')\
+        .annotate(num_posts=Count('roleplaypost'))
+    paginator = Paginator(scenes, 10)
+    page = request.GET.get('page')
+    try:
+        scenes_sub = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        scenes_sub = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        scenes_sub = paginator.page(paginator.num_pages)
+    return render(request, "murpi_core/scenes_rp_view.html", {'rp': rp, 'scenes': scenes_sub})
