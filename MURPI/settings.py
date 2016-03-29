@@ -56,7 +56,7 @@ ROOT_URLCONF = 'MURPI.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,14 +75,11 @@ WSGI_APPLICATION = 'MURPI.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+PROJECT_DIR = os.path.abspath(os.path.dirname(__file__))
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mui',
-        'USER': 'postgres',
-        'PASSWORD': '',
-        'HOST': '192.168.99.100',
-        'PORT': '32768'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(PROJECT_DIR, 'murpi.db'),
     }
 }
 
@@ -122,7 +119,6 @@ TEMPLATE_DIRS = (
 )
 
 DEFAULT_AVATAR = 'img/avatar/default.png'
-DEFAULT_THUMBNAIL = 'img/thumbnail/default.png'
 DEFAULT_BACKGROUND = 'img/background/default.png'
 
 # Authorization / Permissions

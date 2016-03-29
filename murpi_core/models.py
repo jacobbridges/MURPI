@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from MURPI.settings import MEDIA_ROOT
-from jsonfield import JSONField
 import hashlib
 import time
+
+from toolz import curry
 
 # === Methods for MURPI_core models ===
 
@@ -21,28 +21,17 @@ def generate_hash():
     return full_hash.hexdigest()
 
 
-def generate_avatar_path(instance, filename):
+def generate_image_path(instance, filename):
     """
-    Generate new photo filename and path.
-    Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
+    Generate new image filename and path.
+    Photo will be uploaded to MEDIA_ROOT/<category>/<hash>.<ext>
     """
-    return 'img/avatar/{0}.{1}'.format(generate_hash(), filename.split('.')[-1])
-
-
-def generate_thumbnail_path(instance, filename):
-    """
-    Generate new photo filename and path.
-    Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
-    """
-    return 'img/thumbnail/{0}.{1}'.format(generate_hash(), filename.split('.')[-1])
-
-
-def generate_background_path(instance, filename):
-    """
-    Generate new photo filename and path.
-    Photo will be uploaded to MEDIA_ROOT/img/avatar/<hash>.<ext>
-    """
-    return 'img/background/{0}.{1}'.format(generate_hash(), filename.split('.')[-1])
+    return 'img/{category}{hash}.{ext}'.format(
+        category=generate_image_path.category + '/',
+        hash=generate_hash(),
+        ext=filename.split('.')[-1]
+    )
+generate_image_path.category = 'avatar'
 
 
 # === Models for MURPI_core ===
@@ -50,25 +39,49 @@ def generate_background_path(instance, filename):
 # Not adding the verbose documentation to each model until there is a working core.
 
 
-class Player(models.Model):
-    user = models.OneToOneField(User)
-    avatar = models.ImageField(upload_to=generate_avatar_path, width_field='avatar_width', height_field='avatar_height')
-    avatar_width = models.FloatField(null=True)
-    avatar_height = models.FloatField(null=True)
+class MModel(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     date_modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class ModelWithImage(models.Model):
+    _category = 'avatar'
+    generate_image_path.category = _category
+
+    image = models.ImageField(upload_to=generate_image_path, width_field='image_width', height_field='image_height')
+    image_width = models.FloatField(null=True)
+    image_height = models.FloatField(null=True)
+
+    class Meta:
+        abstract = True
+
+    @classmethod
+    def has_file(cls, file_path):
+        return True if cls.objects.filter(image=file_path) else False
+
+
+class ModelWithName(models.Model):
+    name = models.CharField(max_length=100, blank=False)
+
+    class Meta:
+        abstract = True
+
+    def __unicode__(self):
+        return self.name
+
+
+class Player(MModel, ModelWithImage):
+    user = models.OneToOneField(User)
 
     def __unicode__(self):
         return self.user.username
 
-    @staticmethod
-    def has_file(file_path):
-        return True if Player.objects.filter(avatar=file_path) else False
-
 
 # A collection of scenes depicting a complete story
-class Roleplay(models.Model):
-    name = models.CharField(max_length=100, blank=False)
+class Roleplay(ModelWithName):
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
     game_master = models.ForeignKey(Player)
@@ -82,162 +95,86 @@ class Roleplay(models.Model):
         ('FI', 'Finished'),
         ('DD', 'Dead')
     ), default='DV')
-    details = JSONField(null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.name
 
 
 # Universe -> World -> Place -> Scene
-class Universe(models.Model):
-    name = models.CharField(max_length=40, blank=False)
+class Universe(MModel, ModelWithImage, ModelWithName):
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player)
     is_public = models.BooleanField(default=True)
-    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
-    thumbnail_width = models.FloatField(null=True)
-    thumbnail_height = models.FloatField(null=True)
-    background = models.ImageField(upload_to=generate_background_path, null=True, blank=True, width_field='background_width', height_field='background_height', default=MEDIA_ROOT+'/img/background/default.jpg')
-    background_width = models.FloatField(null=True)
-    background_height = models.FloatField(null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
-        return self.name
-
-    @staticmethod
-    def has_file(file_path):
-        return True if Universe.objects.filter(thumbnail=file_path) or Universe.objects.filter(background=file_path) else False
+    _category = 'background'
 
 
 # World -> Place -> Scene
-class World(models.Model):
-    name = models.CharField(max_length=40, blank=False)
+class World(MModel, ModelWithImage, ModelWithName):
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player)
     is_public = models.BooleanField(default=True)
     universe = models.ForeignKey(Universe)
-    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
-    thumbnail_width = models.FloatField(null=True)
-    thumbnail_height = models.FloatField(null=True)
-    background = models.ImageField(upload_to=generate_background_path, null=True, blank=True, width_field='background_width', height_field='background_height', default=MEDIA_ROOT+'/img/background/default.jpg')
-    background_width = models.FloatField(null=True)
-    background_height = models.FloatField(null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
-        return self.name
-
-    @staticmethod
-    def has_file(file_path):
-        return True if World.objects.filter(thumbnail=file_path) or World.objects.filter(background=file_path) else False
+    _category = 'background'
 
     class Meta:
         unique_together = ('name', 'universe',)
 
 
 # Place -> Scene
-class Place(models.Model):
-    name = models.CharField(max_length=40, blank=False)
+class Place(MModel, ModelWithImage, ModelWithName):
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player)
     world = models.ForeignKey(World)
     is_public = models.BooleanField(default=True)
-    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
-    thumbnail_width = models.FloatField(null=True)
-    thumbnail_height = models.FloatField(null=True)
-    background = models.ImageField(upload_to=generate_background_path, null=True, width_field='background_width', height_field='background_height', default=MEDIA_ROOT+'/img/background/default.jpg')
-    background_width = models.FloatField(null=True)
-    background_height = models.FloatField(null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
-        return self.name
-
-    @staticmethod
-    def has_file(file_path):
-        return True if Place.objects.filter(thumbnail=file_path) or Place.objects.filter(background=file_path) else False
+    _category = 'background'
 
     class Meta:
         unique_together = ('name', 'world',)
 
 
-class Scene(models.Model):
-    name = models.CharField(max_length=40, blank=False)
+class Scene(MModel, ModelWithName):
     short_description = models.CharField(max_length=500, null=True)
     owner = models.ForeignKey(Player)
     place = models.ForeignKey(Place)
     roleplay = models.ForeignKey(Roleplay, null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.name
 
     class Meta:
         unique_together = (('name', 'roleplay', 'place'),)
 
 
-class Race(models.Model):
-    name = models.CharField(max_length=50)
+class Race(MModel, ModelWithImage, ModelWithName):
     universe = models.ForeignKey(Universe)
     short_description = models.CharField(max_length=500, null=True)
     description = models.TextField(blank=False)
     owner = models.ForeignKey(Player)
-    thumbnail = models.ImageField(upload_to=generate_thumbnail_path, width_field='thumbnail_width', height_field='thumbnail_height')
-    thumbnail_width = models.FloatField(null=True)
-    thumbnail_height = models.FloatField(null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
 
-    def __unicode__(self):
-        return self.name
+    _category = 'avatar'
 
 
-class CharacterStatus(models.Model):
-    name = models.CharField(max_length=40)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
-
-    def __unicode__(self):
-        return self.name
+class CharacterStatus(ModelWithName):
+    pass
 
 
-class Character(models.Model):
-    name = models.CharField(max_length=100, blank=False)
-    nick = models.CharField(max_length=100, null=True)
+class Character(MModel, ModelWithImage, ModelWithName):
+    nick = models.CharField(max_length=100, blank=True, null=True)
     race = models.ForeignKey(Race, blank=False)
     status = models.ForeignKey(CharacterStatus)
-    avatar = models.ImageField(upload_to=generate_avatar_path, width_field='avatar_width', height_field='avatar_height')
-    avatar_width = models.FloatField(null=True)
-    avatar_height = models.FloatField(null=True)
     home_world = models.ForeignKey(World, blank=False)
     description = models.TextField(null=True)
-    author = models.ForeignKey(Player, related_name='character_author')
-    details = JSONField(null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
+    owner = models.ForeignKey(Player, related_name='character_author')
     modified_by = models.ForeignKey(Player, null=True, related_name='character_modified_by')
 
-    def __unicode__(self):
-        return self.name
+    _category = 'avatar'
 
 
-class RoleplayPost(models.Model):
+class RoleplayPost(MModel):
     text = models.TextField(blank=False)
     author = models.ForeignKey(Player, related_name='rp_post_author')
     character = models.ForeignKey(Character)
     scene = models.ForeignKey(Scene)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
     modified_by = models.ForeignKey(Player, null=True, related_name='rp_post_modified_by')
 
     def __unicode__(self):
@@ -245,38 +182,32 @@ class RoleplayPost(models.Model):
 
 
 # Which characters are referenced in a roleplay post?
-class CharacterRoleplayPost(models.Model):
+class CharacterToRoleplayPost(MModel):
     character = models.ForeignKey(Character)
     post = models.ForeignKey(RoleplayPost)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return "ch {} -> po {}".format(self.character_id, self.post_id)
 
 
-class Discussion(models.Model):
-    name = models.CharField(max_length=100, blank=False)
+class Discussion(MModel, ModelWithName):
     owner = models.ForeignKey(Player)
     status = models.CharField(max_length=2, choices=(
         ('OP', 'Open'),
         ('LK', 'Locked'),
-        ('CL', 'Closed')
+        ('PN', 'Pinned'),
+        ('CL', 'Closed'),
     ), default='OP')
     roleplay = models.ForeignKey(Roleplay, null=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return "{}'s {} discussion for {}".format(self.owner.user.username, self.status, self.roleplay.name)
 
 
-class DiscussionPost(models.Model):
+class DiscussionPost(MModel):
     text = models.TextField(blank=False)
     author = models.ForeignKey(Player, related_name='ds_post_author')
     discussion = models.ForeignKey(Discussion)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_modified = models.DateTimeField(auto_now=True)
     modified_by = models.ForeignKey(Player, null=True, related_name='ds_post_modified_by')
 
     def __unicode__(self):

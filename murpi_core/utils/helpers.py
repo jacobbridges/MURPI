@@ -1,3 +1,4 @@
+from __future__ import print_function
 from django.http.request import QueryDict
 from MURPI.settings import MEDIA_ROOT
 import os
@@ -10,7 +11,7 @@ def dict_has_keys(d, keys, check_not_empty=False):
                 return True
             else:
                 if all([True if d[k] and d[k] is not None else False for k in keys]):
-                    print [True if not d[k] or d[k] is not None else False for k in keys]
+                    print([True if not d[k] or d[k] is not None else False for k in keys])
                     return True
                 else:
                     return False
@@ -32,7 +33,7 @@ def delete_uploaded_file(model, field, file_path):
         try:
             os.remove(MEDIA_ROOT + '/' + file_path)
         except IOError:
-            print u"Was not able to delete file: {}".format(file_path)
+            print(u"Was not able to delete file: {}".format(file_path))
 
 
 def clean_uploaded_files():
@@ -42,5 +43,5 @@ def clean_uploaded_files():
         for name in files:
             if not name.startswith('default') and (name.endswith('.jpg') or name.endswith('.png')):
                 if not any([model.has_file(os.path.join(path, name).split(MEDIA_ROOT)[-1].strip('/')) for model in models_with_file_fields]):
-                    print u"Deleting file {} from directory {}".format(name, path)
+                    print(u"Deleting file {} from directory {}".format(name, path))
                     os.remove(os.path.join(path, name))

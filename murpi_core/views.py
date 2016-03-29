@@ -31,7 +31,7 @@ def register(request):
             if dict_has_keys(request.POST, ('username', 'email', 'password',), check_not_empty=True):
                 User.objects.create_user(request.POST['username'], request.POST['email'], request.POST['password'])
                 new_user = User.objects.get(username=request.POST['username'])
-                Player.objects.create(avatar=DEFAULT_AVATAR, user=new_user)
+                Player.objects.create(image=DEFAULT_AVATAR, user=new_user)
                 success(request, "You successfully created a player! Now please login.")
                 return redirect(reverse("login"))
             else:
@@ -138,7 +138,7 @@ def create_world(request, universe_id):
             try:
                 world.save()
             except IntegrityError:
-                delete_uploaded_file(World, 'thumbnail', world.thumbnail.name)
+                delete_uploaded_file(World, 'image', world.image.name)
                 form.add_error('name', 'This world already exists in the current universe.')
                 context_dict['form'] = form
                 return render(request, "murpi_core/create_world.html", context_dict)
@@ -172,7 +172,7 @@ def create_place(request, world_id):
             try:
                 place.save()
             except IntegrityError:
-                delete_uploaded_file(Place, 'thumbnail', place.thumbnail.name)
+                delete_uploaded_file(Place, 'image', place.image.name)
                 form.add_error('name', 'This place already exists in the current world.')
                 context_dict['form'] = form
                 return render(request, "murpi_core/create_place.html", context_dict)
@@ -274,7 +274,7 @@ def create_rp(request):
             rp.save()
             return redirect(reverse('rp', kwargs={'rp_id': rp.id}))
         else:
-            print form.errors
+            print(form.errors)
             return render(request, "murpi_core/create_rp.html", {'form': form})
     else:
         raise Http404('Only GET, POST, and HEAD HTTP methods allowed.')
@@ -306,7 +306,7 @@ def create_scene_rp_view(request, rp_id):
             scene.save()
             return redirect(reverse('scene', kwargs={'scene_id': scene.id}))
         else:
-            print form.errors
+            print(form.errors)
             return render(request, "murpi_core/create_scene_rp_view.html", {'form': form,
                                                                             'rp': rp})
     else:
@@ -417,8 +417,8 @@ def create_character(request):
 
 
 @require_safe
-def retrieve_character(request, scene_id):
-    character = get_object_or_404(Character, pk=scene_id)
+def retrieve_character(request, character_id):
+    character = get_object_or_404(Character, pk=character_id)
     return render(request, "murpi_core/character.html", {'character': character})
 
 

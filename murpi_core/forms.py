@@ -6,19 +6,19 @@ from .models import Universe, World, Place, Roleplay, Scene, Character
 class PlaceForm(ModelForm):
     class Meta:
         model = Place
-        fields = ['name', 'description', 'is_public', 'thumbnail', 'background']
+        fields = ['name', 'description', 'is_public', 'image']
 
 
 class WorldForm(ModelForm):
     class Meta:
         model = World
-        fields = ['name', 'description', 'is_public', 'thumbnail', 'background']
+        fields = ['name', 'description', 'is_public', 'image']
 
 
 class UniverseForm(ModelForm):
     class Meta:
         model = Universe
-        fields = ['name', 'description', 'is_public', 'thumbnail', 'background']
+        fields = ['name', 'description', 'is_public', 'image']
 
 
 class RoleplayForm(ModelForm):
@@ -42,4 +42,4 @@ class SceneFormForRPView(ModelForm):
 class CharacterForm(ModelForm):
     class Meta:
         model = Character
-        fields = ['name', 'nick', 'race', 'avatar', 'home_world', 'description']
+        fields = ['name', 'nick', 'race', 'image', 'home_world', 'description']
